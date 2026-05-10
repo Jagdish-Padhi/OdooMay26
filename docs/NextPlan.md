@@ -30,7 +30,7 @@ There's no `ActivitySearchPage.jsx` in the client. The backend AI activity searc
 
 ---
 
-## 🟡 Polish That Will Separate You From Others
+## 🟡 Polish That Will Separate You From Others - **All Done**
 
 - **Empty states** — Every page needs a meaningful empty state with a CTA. "No trips yet → Plan your first trip"
 - **Loading skeletons** — You have `Skeleton.jsx` and `Spinner.jsx`. Use them consistently on every data-fetch.

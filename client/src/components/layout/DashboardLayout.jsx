@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   BarChart3, Compass, LayoutDashboard, LogOut,
   MapPinned, Menu, PlusCircle, Search,
-  Sparkles, User as UserIcon, X, CheckSquare, FileText, DollarSign, Sparkles, BarChart3, Archive
+  Sparkles, User as UserIcon, X, CheckSquare, FileText, DollarSign, Archive
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
