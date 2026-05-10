@@ -2,6 +2,7 @@ import { boolean, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-
 import { users } from './users.js';
 
 export const tripStatusEnum = pgEnum('trip_status', ['planning', 'ongoing', 'completed']);
+export const moderationStatusEnum = pgEnum('moderation_status', ['active', 'flagged', 'archived', 'deleted']);
 
 export const trips = pgTable('trips', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -14,6 +15,7 @@ export const trips = pgTable('trips', {
   description: text('description'),
   coverPhoto: text('cover_photo'),
   status: tripStatusEnum('status').default('planning').notNull(),
+  moderationStatus: moderationStatusEnum('moderation_status').default('active').notNull(),
   isPublic: boolean('is_public').default(false).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),

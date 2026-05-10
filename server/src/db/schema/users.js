@@ -2,6 +2,7 @@ import { boolean, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-
 
 
 export const planEnum = pgEnum('plan', ['free', 'pro']);
+export const roleEnum = pgEnum('role', ['user', 'admin']);
 
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -10,6 +11,7 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash').notNull(),
   refreshTokenHash: text('refresh_token_hash'),
   plan: planEnum('plan').default('free').notNull(),
+  role: roleEnum('role').default('user').notNull(),
 
   lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
 

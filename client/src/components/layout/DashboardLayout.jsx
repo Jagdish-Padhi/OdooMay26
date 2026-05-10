@@ -20,7 +20,7 @@ const navigationItems = [
   { label: 'Trip Notes', path: '/dashboard/notes', icon: FileText },
   { label: 'Discover', path: '/discover', icon: Compass },
   { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
-  { label: 'Admin', path: '/dashboard/admin', icon: BarChart3 },
+  { label: 'Admin Control', path: '/dashboard/admin', icon: BarChart3 },
 ];
 
 function SidebarContent({ onNavigate, isCollapsed, onToggle }) {
@@ -35,6 +35,13 @@ function SidebarContent({ onNavigate, isCollapsed, onToggle }) {
     toast.success('Logged out.');
     navigate('/login');
   };
+
+  const filteredNavigation = navigationItems.filter(item => {
+    if (item.path === '/dashboard/admin') {
+      return user?.role === 'admin';
+    }
+    return true;
+  });
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -57,7 +64,7 @@ function SidebarContent({ onNavigate, isCollapsed, onToggle }) {
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-4 scrollbar-hide">
-        {navigationItems.map(({ label, path, icon: Icon }) => {
+        {filteredNavigation.map(({ label, path, icon: Icon }) => {
           const active = location.pathname === path;
           return (
             <Link
