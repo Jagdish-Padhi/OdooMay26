@@ -478,8 +478,43 @@ export default function ItineraryBuilderPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-6">
+          {/* Welcome / Empty State Guide */}
+          {stops.length === 0 && (
+            <Card className="bg-linear-to-br from-(--app-color-primary) to-slate-900 text-white border-none shadow-2xl overflow-hidden relative group">
+              <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
+              <div className="relative z-10 p-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/30 shadow-inner">
+                    <Sparkles className="text-white animate-pulse" size={32} />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-black tracking-tight">Let's build your journey.</h2>
+                    <p className="text-white/70 font-medium">Follow these 3 simple steps to create a world-class itinerary.</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-4 mt-8">
+                  {[
+                    { step: '01', title: 'Add Cities', desc: 'Use the search box below to add your first destination.', icon: MapPin },
+                    { step: '02', title: 'Set Dates', desc: 'Define when you arrive and leave each city stop.', icon: CalendarDays },
+                    { step: '03', title: 'Add Activities', desc: 'Search and attach things to do at each destination.', icon: CirclePlus },
+                  ].map((item, i) => (
+                    <div key={i} className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:border-white/30 transition-all">
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-xs font-black px-2 py-0.5 rounded-full bg-white/20">{item.step}</span>
+                        <item.icon size={20} className="text-white/60" />
+                      </div>
+                      <h4 className="font-bold mb-1">{item.title}</h4>
+                      <p className="text-xs text-white/60 leading-relaxed">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          )}
+
           <Card
-            title="Add destinations"
+            title="Step 1: Add destinations"
             subtitle="Search cities by country, popularity, and cost index."
             headerAction={<span className="text-sm font-medium text-(--app-color-text-muted)">{stops.length} stops</span>}
             className="p-0"
@@ -512,6 +547,14 @@ export default function ItineraryBuilderPage() {
                       </div>
                     </button>
                   ))}
+                </div>
+              )}
+
+              {cityQuery.trim().length >= 2 && cityResults.length === 0 && (
+                <div className="rounded-2xl border border-dashed border-(--app-color-border) p-8 text-center">
+                   <Search size={24} className="mx-auto mb-3 text-slate-300" />
+                   <p className="text-sm text-(--app-color-text-muted)">No cities found matching "{cityQuery}".</p>
+                   <p className="text-xs text-slate-400 mt-1">Try a different name or check the spelling.</p>
                 </div>
               )}
 
@@ -754,10 +797,16 @@ export default function ItineraryBuilderPage() {
                 </MapContainer>
               </div>
             ) : (
-              <div className="flex h-56 items-center justify-center rounded-2xl border border-dashed border-(--app-color-border) text-sm text-(--app-color-text-muted)">
-                <div className="text-center">
-                  <MapPinned size={28} className="mx-auto mb-3" />
-                  Add a few cities to see the trip path here.
+              <div className="flex h-80 items-center justify-center rounded-2xl border-2 border-dashed border-(--app-color-border) bg-slate-50/50 text-slate-400">
+                <div className="text-center max-w-xs px-6">
+                  <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto mb-6">
+                    <MapPinned size={32} className="text-slate-300" />
+                  </div>
+                  <h4 className="text-lg font-bold text-slate-900 mb-2">Map is waiting for stops</h4>
+                  <p className="text-sm leading-relaxed mb-6">Once you add cities in **Step 1**, we'll automatically plot them on this interactive map and calculate the routes for you.</p>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-black uppercase tracking-widest text-white shadow-lg">
+                    Start by searching above
+                  </div>
                 </div>
               </div>
             )}

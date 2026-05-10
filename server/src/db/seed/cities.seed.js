@@ -1,4 +1,4 @@
-import { getDb } from '../index.js';
+import { connectDatabase, getDb } from '../../config/database.js';
 import { cities } from '../schema/index.js';
 
 const SEED_CITIES = [
@@ -57,6 +57,7 @@ const SEED_CITIES = [
 ];
 
 export async function seedCities() {
+  await connectDatabase();
   const db = getDb();
 
   const result = await db
