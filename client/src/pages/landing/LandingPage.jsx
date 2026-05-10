@@ -64,8 +64,7 @@ export default function LandingPage() {
         <div className="grid w-full items-center gap-10 lg:grid-cols-[1fr_1.1fr]">
           {/* Left: Content */}
           <div className="text-left py-10 lg:py-0">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-(--app-color-border) bg-white/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-(--app-color-primary) backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-(--app-color-primary)" />
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border-none bg-(--app-color-primary) px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white backdrop-blur shadow-lg">
               The Ultimate Travel Planner
             </div>
 
@@ -80,9 +79,8 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Link to="/register" className="flex items-center justify-center gap-2 rounded-2xl bg-(--app-color-primary) px-8 py-4 text-base font-bold text-white shadow-xl hover:bg-(--app-color-primary-hover) transition-all hover:scale-105">
+              <Link to="/register" className="flex items-center justify-center rounded-2xl bg-(--app-color-primary) px-8 py-4 text-base font-bold text-white shadow-xl hover:bg-(--app-color-primary-hover) transition-all hover:scale-105">
                 Start Planning Now
-                <ArrowRight size={20} />
               </Link>
               <Link to="/login" className="flex items-center justify-center rounded-2xl border border-(--app-color-border) bg-white/70 px-8 py-4 text-base font-semibold text-(--app-color-text) backdrop-blur hover:bg-white transition-colors">
                 Sign In
@@ -142,7 +140,7 @@ export default function LandingPage() {
         <h2 className="mb-4 text-3xl font-black text-(--app-color-text)">Ready for your next trip?</h2>
         <p className="mb-8 text-(--app-color-text-muted)">Join Traveloop today and start exploring.</p>
         <Link to="/register" className="rounded-2xl bg-(--app-color-primary) px-10 py-4 text-base font-bold text-white shadow-xl hover:bg-(--app-color-primary-hover) transition-all hover:scale-105">
-          Start Now →
+          Start Now
         </Link>
       </section>
 
