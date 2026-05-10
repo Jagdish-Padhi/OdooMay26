@@ -1,4 +1,4 @@
-import { numeric, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { integer, numeric, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { stops } from './stops.js';
 
 export const activityTypeEnum = pgEnum('activity_type', [
@@ -21,6 +21,7 @@ export const activities = pgTable('activities', {
   type: activityTypeEnum('type').default('other').notNull(),
   cost: numeric('cost', { precision: 10, scale: 2 }).default('0').notNull(),
   duration: text('duration'),
+  order: integer('order').notNull().default(1),
 
   notes: text('notes'),
   startTime: timestamp('start_time', { withTimezone: true }),

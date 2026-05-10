@@ -7,8 +7,9 @@
  */
 import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer';
+import ProductStory from '../../components/landing/ProductStory';
 
-// TODO: Replace these with your real feature cards
+// ...
 import { 
   Plane, 
   Wallet, 
@@ -59,10 +60,10 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="relative z-10 mx-auto max-w-7xl px-6 py-20 lg:py-32">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <section className="relative z-10 mx-auto max-w-7xl px-6 flex min-h-[calc(100vh-80px)] items-center">
+        <div className="grid w-full items-center gap-10 lg:grid-cols-[1fr_1.1fr]">
           {/* Left: Content */}
-          <div className="text-left">
+          <div className="text-left py-10 lg:py-0">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-(--app-color-border) bg-white/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-(--app-color-primary) backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-(--app-color-primary)" />
               The Ultimate Travel Planner
@@ -90,18 +91,10 @@ export default function LandingPage() {
           </div>
 
           {/* Right: Visual Container / Mockup */}
-          <div className="relative">
-            <div className="relative overflow-hidden rounded-[2.5rem] border border-white/20 bg-white/10 p-2 shadow-2xl backdrop-blur-sm">
-              <div className="aspect-[4/3] w-full rounded-[2rem] bg-gradient-to-br from-white/10 to-white/5 shadow-inner relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-4 opacity-20">
-                    <Plane size={64} strokeWidth={1} className="text-white" />
-                    <span className="text-white text-xl font-black uppercase tracking-[0.5em]">Traveloop Story</span>
-                  </div>
-                </div>
-                {/* Aurora effect inside mockup */}
-                <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-teal-500/10 blur-[80px]" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-500/10 blur-[80px]" />
+          <div className="relative py-10 lg:py-0">
+            <div className="relative overflow-hidden rounded-[3rem] border border-(--app-color-border)/30 bg-white p-2 shadow-2xl transition-transform hover:scale-[1.01]">
+              <div className="h-[460px] w-full rounded-[2.5rem] relative overflow-hidden">
+                <ProductStory />
               </div>
             </div>
             
