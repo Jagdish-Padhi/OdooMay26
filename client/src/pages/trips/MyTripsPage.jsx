@@ -112,13 +112,12 @@ export default function MyTripsPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button variant="secondary" size="sm" className="flex-1" onClick={() => navigate(`/trips/new?tripId=${trip.id}`)}>
-                    <PencilLine size={15} />
-                    Edit
-                  </Button>
                   <Button size="sm" className="flex-1" onClick={() => navigate(`/trips/${trip.id}/builder`)}>
                     <Route size={15} />
-                    Plan
+                    Itinerary
+                  </Button>
+                  <Button variant="secondary" size="sm" onClick={() => navigate(`/trips/new?tripId=${trip.id}`)}>
+                    <PencilLine size={15} />
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => handleDelete(trip)} className="text-red-600 hover:bg-red-50">
                     <Trash2 size={15} />

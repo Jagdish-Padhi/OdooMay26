@@ -26,8 +26,8 @@ export async function addActivity(stopId, data) {
       cost: data.cost ?? 0,
       duration: data.duration ?? null,
       notes: data.notes ?? null,
-      startTime: data.startTime ?? null,
-      endTime: data.endTime ?? null,
+      startTime: data.startTime ? new Date(data.startTime) : null,
+      endTime: data.endTime ? new Date(data.endTime) : null,
       order,
     })
     .returning();
@@ -37,9 +37,14 @@ export async function addActivity(stopId, data) {
 
 export async function updateActivity(stopId, activityId, data) {
   const db = getDb();
+  const updateData = { ...data, updatedAt: new Date() };
+
+  if (data.startTime) updateData.startTime = new Date(data.startTime);
+  if (data.endTime) updateData.endTime = new Date(data.endTime);
+
   const [updated] = await db
     .update(activities)
-    .set({ ...data, updatedAt: new Date() })
+    .set(updateData)
     .where(and(eq(activities.id, activityId), eq(activities.stopId, stopId)))
     .returning();
 
