@@ -11,12 +11,10 @@ async function bootstrap() {
 
   const server = createServer(app);
 
-  const server = createServer(app);
-
   server.listen(PORT, () => {
-
     logger.info(`Server running on http://localhost:${PORT}`);
   });
+
 }
 
 bootstrap().catch((err) => {
