@@ -14,6 +14,7 @@ import {
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import ProgressBar from '../../components/ProgressBar';
+import Button from '../../components/Button';
 
 export default function BudgetPage() {
   const [budgetData, setBudgetData] = useState(null);
