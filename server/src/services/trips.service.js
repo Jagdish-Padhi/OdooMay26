@@ -29,6 +29,38 @@ async function attachDestinationCounts(tripRows) {
   return mergeDestinationCounts(tripRows, countRows);
 }
 
+async function loadTripStopsWithActivities(tripId) {
+  const db = getDb();
+
+  const stopRows = await db
+    .select({ stop: stops })
+    .from(stops)
+    .where(eq(stops.tripId, tripId))
+    .orderBy(asc(stops.order), asc(stops.createdAt));
+
+  if (!stopRows.length) return [];
+
+  const stopIds = stopRows.map(({ stop }) => stop.id);
+  const activityRows = await db
+    .select({ activity: activities })
+    .from(activities)
+    .where(inArray(activities.stopId, stopIds))
+    .orderBy(asc(activities.order), asc(activities.createdAt));
+
+  const activitiesByStop = new Map();
+
+  for (const { activity } of activityRows) {
+    const list = activitiesByStop.get(activity.stopId) ?? [];
+    list.push(activity);
+    activitiesByStop.set(activity.stopId, list);
+  }
+
+  return stopRows.map(({ stop }) => ({
+    ...stop,
+    activities: activitiesByStop.get(stop.id) ?? [],
+  }));
+}
+
 export async function createTrip(userId, data) {
   const db = getDb();
   const [trip] = await db
@@ -81,7 +113,13 @@ export async function getPublicTripById(tripId) {
   if (!trip) return null;
 
   const [enrichedTrip] = await attachDestinationCounts([trip]);
-  return enrichedTrip ?? null;
+  if (!enrichedTrip) return null;
+
+  const stopsWithActivities = await loadTripStopsWithActivities(tripId);
+  return {
+    ...enrichedTrip,
+    stops: stopsWithActivities,
+  };
 }
 
 /**
