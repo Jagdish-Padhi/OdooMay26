@@ -67,51 +67,62 @@ export default function MyTripsPage() {
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {trips.map((trip) => (
-            <Card key={trip.id} className="overflow-hidden p-0">
+            <div key={trip.id} className="group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm hover:shadow-lg transition-shadow">
+              {/* Banner */}
               <div
-                className="h-40 bg-linear-to-br from-(--app-color-primary) via-[#8c5c84] to-(--app-color-accent)"
+                className="h-36 bg-linear-to-br from-(--app-color-primary) via-[#8c5c84] to-(--app-color-accent) relative shrink-0"
                 style={trip.coverPhoto ? { backgroundImage: `linear-gradient(rgba(18,18,18,0.35), rgba(18,18,18,0.55)), url(${trip.coverPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
               >
                 <div className="flex h-full items-start justify-between p-4 text-white">
-                  <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] backdrop-blur">
+                  <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest backdrop-blur">
                     {trip.status}
                   </span>
-                  <span className="rounded-full bg-black/20 px-3 py-1 text-[10px] font-semibold backdrop-blur">
+                  <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest backdrop-blur">
                     {trip.isPublic ? 'Public' : 'Private'}
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-4 p-5">
+              {/* Body */}
+              <div className="flex flex-1 flex-col p-5 space-y-4">
+                {/* Title + Date */}
                 <div>
-                  <h3 className="text-lg font-bold text-(--app-color-text)">{trip.name}</h3>
-                  <p className="mt-1 flex items-center gap-2 text-sm text-(--app-color-text-muted)">
-                    <CalendarDays size={14} />
+                  <h3 className="text-base font-black text-slate-900 leading-tight line-clamp-1">{trip.name}</h3>
+                  <p className="mt-1.5 flex items-center gap-2 text-xs text-slate-400 font-medium">
+                    <CalendarDays size={13} />
                     {formatDateRange(trip.startDate, trip.endDate)}
                   </p>
                 </div>
 
-                {trip.description && <p className="text-sm leading-6 text-(--app-color-text-muted)">{trip.description}</p>}
+                {/* Description — always occupies space, clamped to 2 lines */}
+                <p className="text-sm leading-relaxed text-slate-500 line-clamp-2 min-h-[2.75rem]">
+                  {trip.description || 'No description added yet.'}
+                </p>
 
-                <div className="flex items-center justify-between rounded-2xl bg-(--app-color-surface-elevated) px-4 py-3 text-sm">
-                  <span className="text-(--app-color-text-muted)">Destinations planned</span>
-                  <span className="font-bold text-(--app-color-text)">{trip.destinationCount ?? 0}</span>
+                {/* Stats Row */}
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-2.5 text-sm">
+                  <span className="text-slate-400 text-xs font-medium">Destinations</span>
+                  <span className="font-black text-slate-900">{trip.destinationCount ?? 0}</span>
                 </div>
 
-                <div className="flex gap-3">
-                  <Button size="sm" className="flex-1" onClick={() => navigate(`/trips/${trip.id}/builder`)}>
-                    <Route size={15} />
+                {/* Spacer pushes actions to bottom */}
+                <div className="flex-1" />
+
+                {/* Actions — always pinned to bottom */}
+                <div className="flex gap-2 pt-1">
+                  <Button size="sm" className="flex-1 rounded-xl" onClick={() => navigate(`/trips/${trip.id}/builder`)}>
+                    <Route size={14} />
                     Itinerary
                   </Button>
-                  <Button variant="secondary" size="sm" onClick={() => navigate(`/trips/new?tripId=${trip.id}`)}>
-                    <PencilLine size={15} />
+                  <Button variant="secondary" size="sm" className="rounded-xl" onClick={() => navigate(`/trips/new?tripId=${trip.id}`)}>
+                    <PencilLine size={14} />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(trip)} className="text-red-600 hover:bg-red-50">
-                    <Trash2 size={15} />
+                  <Button variant="ghost" size="sm" className="rounded-xl text-red-500 hover:bg-red-50" onClick={() => handleDelete(trip)}>
+                    <Trash2 size={14} />
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
