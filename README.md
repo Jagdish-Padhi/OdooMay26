@@ -8,10 +8,9 @@
 
 ## 🔗 Project Showcase
 
-| 🚀 Live Platform | 🎥 Video Walkthrough | 🎨 UI Mockups |
-|:------------:|:-------------------:|:---------------:|
-| [**Launch App**](https://traveloop-seven.vercel.app/) | [**Watch Demo**](https://drive.google.com/file/d/15r-YXEm7EBh-PMB1GJkWEzfJ8ml8knue/view) | [**View Gallery**](#-ui-showcase) |
-
+| 🚀 Live Platform | 🎥 Video Walkthrough | 
+|:------------:|:-------------------:|
+| [**Launch App**](https://traveloop-seven.vercel.app/) | [**Watch Demo**](https://drive.google.com/file/d/15r-YXEm7EBh-PMB1GJkWEzfJ8ml8knue/view) |
 ---
 
 ## 🎯 Problem Statement
@@ -28,14 +27,23 @@ TraveLoop provides a unified, continuous workflow:
 
 ## 🖼️ UI Showcase
 
-| Dashboard Overview | AI Itinerary Generation | Interactive Map Builder |
-|:---:|:---:|:---:|
-| ![Dashboard](https://placehold.co/600x400/0f172a/white?text=Dashboard+Overview) | ![AI Planner](https://placehold.co/600x400/7c3aed/white?text=AI+Itinerary+Magic) | ![Map Builder](https://placehold.co/600x400/0d9488/white?text=Interactive+Route+Map) |
+<div align="center">
 
-| Budget Analytics | Trip Journal | Professional Reports |
-|:---:|:---:|:---:|
-| ![Budget](https://placehold.co/600x400/db2777/white?text=Real-time+Budgeting) | ![Notes](https://placehold.co/600x400/4f46e5/white?text=Trip+Journaling) | ![Reports](https://placehold.co/600x400/020617/white?text=Exportable+PDF+Gallery) |
+| 📱 Dashboard & Trip Management |
+| :---: |
+| <img src="https://github.com/user-attachments/assets/0547370d-043c-40a8-b59b-36bdbbba73e5" width="800" /> |
 
+<br />
+
+| 🌍 Destination Explorer |
+| :---: |
+| <img src="https://github.com/user-attachments/assets/3f9ec7c7-2544-47b2-b75d-8259c6ff9f34" width="800" /> |
+
+<br />
+
+</div>
+
+## MANY MORE IN LIVE LINK
 ---
 
 ## 🚀 Key Features
