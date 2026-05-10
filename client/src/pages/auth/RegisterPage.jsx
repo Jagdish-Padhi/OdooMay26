@@ -91,7 +91,7 @@ export default function RegisterPage() {
             <div className="relative z-10 flex flex-col items-center">
               <div className="flex flex-col items-center gap-6">
                 {/* TODO: Replace /logo.png */}
-                <img src="/logo.png" alt="TravLoop Logo" className="h-48 w-48 object-contain drop-shadow-2xl" />
+                <img src="/logo.png" alt="TravLoop Logo" className="h-64 w-64 object-contain drop-shadow-2xl" />
                 <div className="h-[3px] w-16 rounded-full bg-teal-500" />
               </div>
               <div className="mt-8">

@@ -96,51 +96,62 @@ export default function CitySearchPage() {
           {[...Array(6)].map((_, i) => <TripCardSkeleton key={i} />)}
         </div>
       ) : cities.length === 0 ? (
-        <NoCityResultsState query={searchQuery} />
+        <NoCityResultsState query={query} />
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {cities.map((city) => (
-            <Card key={city.id} className="overflow-hidden p-0">
+            <Card key={city.id} className="group overflow-hidden p-0 rounded-2xl border border-slate-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
               <div
-                className="relative h-44 bg-cover bg-center"
-                style={city.imageUrl ? { backgroundImage: `linear-gradient(rgba(17,17,17,0.2), rgba(17,17,17,0.55)), url(${city.imageUrl})` } : { background: 'linear-gradient(135deg, #c9d6ff 0%, #e2e2e2 100%)' }}
+                className="relative h-48 overflow-hidden"
               >
-                <div className="flex h-full items-start justify-between p-4 text-white">
-                  <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${COST_STYLES[city.costIndex] || 'bg-white/20 text-white'}`}>
+                {/* Background Image with Zoom effect */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                  style={city.imageUrl ? { backgroundImage: `linear-gradient(rgba(17,17,17,0.1), rgba(17,17,17,0.4)), url(${city.imageUrl})` } : { background: 'linear-gradient(135deg, #c9d6ff 0%, #e2e2e2 100%)' }}
+                />
+                
+                <div className="relative flex h-full items-start justify-between p-5 text-white">
+                  <span className={`rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] shadow-sm ${COST_STYLES[city.costIndex] || 'bg-white/20 text-white'}`}>
                     {city.costIndex}
                   </span>
-                  <span className="rounded-full bg-black/20 px-3 py-1 text-[10px] font-semibold backdrop-blur">
+                  <span className="rounded-full bg-black/20 px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white backdrop-blur-md border border-white/5">
                     {city.popularity} popularity
                   </span>
                 </div>
-                <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-                  <h3 className="text-xl font-black">{city.name}</h3>
-                  <p className="text-sm text-white/80">{city.country}</p>
+                
+                <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                  <h3 className="text-xl font-black uppercase tracking-tight">{city.name}</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <MapPinned size={12} className="text-white/60" />
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/80">{city.country}</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-4 p-5">
-                <p className="text-sm leading-6 text-(--app-color-text-muted)">{city.description || 'A destination worth exploring.'}</p>
+              <div className="space-y-4 p-6">
+                <p className="text-sm leading-relaxed text-slate-500 line-clamp-2 min-h-[2.5rem] italic">
+                  {city.description || 'A destination worth exploring and discovering new experiences.'}
+                </p>
 
-                <div className="flex items-center justify-between rounded-2xl bg-(--app-color-surface-elevated) px-4 py-3 text-sm">
-                  <span className="flex items-center gap-2 text-(--app-color-text-muted)"><Building2 size={14} /> Country</span>
-                  <span className="font-semibold text-(--app-color-text)">{city.country}</span>
+                <div className="grid gap-2">
+                  <div className="flex items-center justify-between rounded-xl bg-slate-50/80 px-4 py-2.5 text-xs border border-slate-100/50">
+                    <span className="flex items-center gap-2 font-black uppercase tracking-widest text-slate-400"><Globe2 size={12} /> Cost Profile</span>
+                    <span className="font-black text-slate-900 uppercase tracking-tight">{COST_LABELS[city.costIndex] || city.costIndex}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-xl bg-slate-50/80 px-4 py-2.5 text-xs border border-slate-100/50">
+                    <span className="flex items-center gap-2 font-black uppercase tracking-widest text-slate-400"><Sparkles size={12} /> Rating</span>
+                    <span className="font-black text-slate-900 uppercase tracking-tight">{city.popularity}/100</span>
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between rounded-2xl bg-(--app-color-surface-elevated) px-4 py-3 text-sm">
-                  <span className="flex items-center gap-2 text-(--app-color-text-muted)"><Globe2 size={14} /> Cost profile</span>
-                  <span className="font-semibold text-(--app-color-text)">{COST_LABELS[city.costIndex] || city.costIndex}</span>
-                </div>
-
-                <div className="flex items-center justify-between rounded-2xl bg-(--app-color-surface-elevated) px-4 py-3 text-sm">
-                  <span className="flex items-center gap-2 text-(--app-color-text-muted)"><Sparkles size={14} /> Popularity</span>
-                  <span className="font-semibold text-(--app-color-text)">{city.popularity}</span>
-                </div>
-
-                <Button variant="secondary" fullWidth onClick={() => navigate(`/trips/new?destination=${encodeURIComponent(city.name)}`)}>
+                <button 
+                  onClick={() => navigate(`/trips/new?destination=${encodeURIComponent(city.name)}`)}
+                  className="group/btn flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-4 text-[10px] font-black uppercase tracking-[0.2em] !text-white transition-all hover:bg-(--app-color-primary) hover:shadow-lg active:scale-95"
+                >
                   Plan this trip
-                  <ArrowRight size={16} />
-                </Button>
+                  <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1 !text-white" />
+                </button>
               </div>
             </Card>
           ))}

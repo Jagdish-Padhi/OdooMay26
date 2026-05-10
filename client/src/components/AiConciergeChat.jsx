@@ -30,6 +30,7 @@ export default function AiConciergeChat({ tripId, tripName }) {
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState('');
   const [initializedForTrip, setInitializedForTrip] = useState(null);
+  const [isLive, setIsLive] = useState(null);
 
   const scrollRef = useRef(null);
 
@@ -130,6 +131,7 @@ export default function AiConciergeChat({ tripId, tripName }) {
             : message,
         ),
       );
+      setIsLive(!!result.isLive);
     } catch (error) {
       setMessages((current) => current.filter((message) => message.id !== assistantPlaceholderId));
       toast.error(error.message || 'Could not send your question.');
@@ -160,6 +162,12 @@ export default function AiConciergeChat({ tripId, tripName }) {
                 <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-(--app-color-text-muted)">
                   <MessageCircle size={14} />
                   AI Concierge
+                  {isLive !== null && (
+                    <span className="relative ml-1 flex h-2.5 w-2.5">
+                      <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${isLive ? 'bg-sky-400' : 'bg-(--app-color-primary)'}`} />
+                      <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${isLive ? 'bg-sky-500' : 'bg-(--app-color-primary)'}`} />
+                    </span>
+                  )}
                 </p>
                 <h2 className="mt-1 text-lg font-black text-slate-900">{tripName}</h2>
               </div>

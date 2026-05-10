@@ -93,6 +93,7 @@ router.post('/chat', optionalVerifyToken, async (req, res, next) => {
         success: true,
         data: {
           reply: completion.reply,
+          isLive: !!completion.isLive,
         },
       });
     }
@@ -101,6 +102,7 @@ router.post('/chat', optionalVerifyToken, async (req, res, next) => {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache, no-transform');
     res.setHeader('X-Accel-Buffering', 'no');
+    res.setHeader('X-AI-Live', completion.isLive ? '1' : '0');
 
     let assistantReply = '';
 
@@ -125,6 +127,19 @@ router.post('/chat', optionalVerifyToken, async (req, res, next) => {
     }
 
     return res.end();
+  }
+});
+
+router.post('/packing-list/:tripId/generate', verifyToken, async (req, res, next) => {
+  try {
+    const { tripId } = req.params;
+    const userId = req.auth.userId;
+
+    const newItems = await aiService.generateAndPersistPackingList({ tripId, userId });
+
+    return res.status(200).json({ success: true, data: newItems });
+  } catch (err) {
+    return next(err);
   }
 });
 

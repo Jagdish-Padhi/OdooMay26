@@ -158,22 +158,22 @@ export default function ItineraryBuilderPage() {
     <div className="flex h-[calc(100vh-56px)] lg:h-screen overflow-hidden bg-white select-none">
       
       {/* ── Fixed Step Indicator ── */}
-      <div className="w-16 flex flex-col items-center py-8 bg-slate-50 border-r border-slate-100 shrink-0">
+      <div className="w-20 flex flex-col items-center py-8 bg-slate-50 border-r border-slate-100 shrink-0">
         {[1, 2, 3].map(s => (
           <button 
             key={s}
             onClick={() => setActiveStep(s)}
             className={`mb-10 flex flex-col items-center transition-all ${activeStep === s ? 'text-(--app-color-primary)' : 'text-slate-300'}`}
           >
-            <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-xs font-black transition-all ${activeStep === s ? 'bg-(--app-color-primary) text-white shadow-lg' : 'bg-white border border-slate-200'}`}>
+            <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-sm font-black transition-all ${activeStep === s ? 'bg-(--app-color-primary) text-white shadow-lg' : 'bg-white border border-slate-200'}`}>
               {s}
             </div>
-            <span className="mt-2 text-[8px] font-black uppercase tracking-widest">Step {s}</span>
+            <span className="mt-2 text-[10px] font-bold uppercase tracking-widest">Step {s}</span>
           </button>
         ))}
         <div className="mt-auto">
-           <button onClick={() => navigate('/trips')} className="h-8 w-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400">
-             <ChevronLeft size={16} />
+           <button onClick={() => navigate('/trips')} className="h-9 w-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+             <ChevronLeft size={18} />
            </button>
         </div>
       </div>
@@ -185,19 +185,19 @@ export default function ItineraryBuilderPage() {
       >
         <div className="h-16 px-6 flex items-center justify-between bg-white border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-(--app-color-primary-soft) flex items-center justify-center text-(--app-color-primary)">
-               <Settings2 size={14} />
+            <div className="h-9 w-9 rounded-lg bg-(--app-color-primary-soft) flex items-center justify-center text-(--app-color-primary)">
+               <Settings2 size={16} />
             </div>
             <div>
-              <h1 className="text-xs font-black text-slate-900 uppercase tracking-tight">{trip?.name}</h1>
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Step {activeStep} <span className="mx-1">•</span> {activeStep === 1 ? 'Discovery' : activeStep === 2 ? 'Planning' : 'Intelligence'}</p>
+              <h1 className="text-sm font-black text-slate-900 uppercase tracking-tight">{trip?.name}</h1>
+              <p className="text-xs font-bold text-slate-400">Step {activeStep} <span className="mx-1">•</span> {activeStep === 1 ? 'Discovery' : activeStep === 2 ? 'Planning' : 'Intelligence'}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
              <div className="hidden md:flex gap-1.5">
-                {[1, 2, 3].map(s => <div key={s} className={`h-1 w-6 rounded-full transition-all ${activeStep >= s ? 'bg-(--app-color-primary)' : 'bg-slate-100'}`} />)}
+                {[1, 2, 3].map(s => <div key={s} className={`h-1.5 w-6 rounded-full transition-all ${activeStep >= s ? 'bg-(--app-color-primary)' : 'bg-slate-100'}`} />)}
              </div>
-             <Button as={Link} to={`/trips/${tripId}/view`} variant="secondary" size="xs" className="rounded-lg text-[9px] uppercase font-black">Finish</Button>
+             <Button as={Link} to={`/trips/${tripId}/view`} variant="secondary" size="xs" className="rounded-lg text-xs uppercase font-black">Finish</Button>
           </div>
         </div>
 
@@ -207,21 +207,21 @@ export default function ItineraryBuilderPage() {
             {activeStep === 1 && (
               <div className="flex flex-col h-full space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
                 <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm shrink-0">
-                  <h2 className="text-sm font-black text-slate-900 uppercase mb-4 tracking-tight">Step 1: Add Destinations</h2>
+                  <h2 className="text-base font-black text-slate-900 uppercase mb-4 tracking-tight">Step 1: Add Destinations</h2>
                   <div className="relative">
                     <Input 
                       value={cityQuery}
                       onChange={(e) => setCityQuery(e.target.value)}
                       placeholder="Search a global city..."
-                      className="text-xs py-4 rounded-xl border-slate-200"
+                      className="text-sm py-4 rounded-xl border-slate-200"
                       icon={Search}
                     />
                     {cityResults.length > 0 && (
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-100 rounded-xl shadow-xl z-50 overflow-hidden">
                         {cityResults.map(city => (
-                          <button key={city.id} onClick={() => handleAddStop(city)} className="w-full px-5 py-3 flex items-center justify-between hover:bg-slate-50 group transition-all">
-                            <div className="text-left"><p className="font-bold text-slate-900 text-xs">{city.name}</p><p className="text-[8px] text-slate-400 uppercase font-black">{city.country}</p></div>
-                            <Plus size={14} className="text-slate-300 group-hover:text-(--app-color-primary)" />
+                          <button key={city.id} onClick={() => handleAddStop(city)} className="w-full px-5 py-3.5 flex items-center justify-between hover:bg-slate-50 group transition-all">
+                            <div className="text-left"><p className="font-bold text-slate-900 text-sm">{city.name}</p><p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">{city.country}</p></div>
+                            <Plus size={16} className="text-slate-300 group-hover:text-(--app-color-primary)" />
                           </button>
                         ))}
                       </div>
@@ -230,55 +230,55 @@ export default function ItineraryBuilderPage() {
                 </div>
 
                 <div className="flex-1 flex flex-col overflow-hidden">
-                  <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 px-1">Planned Nodes ({stops.length})</h3>
-                  <div className="flex-1 overflow-y-auto space-y-2 pr-2 scrollbar-hide">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3 px-1">Planned Stops ({stops.length})</h3>
+                  <div className="flex-1 overflow-y-auto space-y-2.5 pr-2 scrollbar-hide">
                     {stops.map((e, i) => (
-                      <div key={e.stop.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl shadow-xs group">
-                        <span className="h-6 w-6 rounded-md bg-(--app-color-primary) text-white flex items-center justify-center text-[10px] font-black">{i + 1}</span>
-                        <div className="flex-1 truncate"><p className="font-bold text-slate-900 text-xs leading-none mb-0.5 truncate">{e.city?.name}</p><p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{e.city?.country}</p></div>
-                        <button onClick={() => handleDeleteStop(e.stop.id)} className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={12} /></button>
+                      <div key={e.stop.id} className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-xl shadow-xs group">
+                        <span className="h-8 w-8 rounded-lg bg-(--app-color-primary) text-white flex items-center justify-center text-xs font-black">{i + 1}</span>
+                        <div className="flex-1 truncate"><p className="font-bold text-slate-900 text-sm leading-none mb-1 truncate">{e.city?.name}</p><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{e.city?.country}</p></div>
+                        <button onClick={() => handleDeleteStop(e.stop.id)} className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14} /></button>
                       </div>
                     ))}
-                    {stops.length === 0 && <div className="p-8 text-center border border-dashed border-slate-200 rounded-2xl text-[10px] text-slate-400 uppercase font-black">Search above to add stops</div>}
+                    {stops.length === 0 && <div className="p-8 text-center border border-dashed border-slate-200 rounded-2xl text-xs text-slate-400 uppercase font-bold">Search above to add stops</div>}
                   </div>
                 </div>
               </div>
             )}
 
             {activeStep === 2 && (
-              <div className="flex flex-col h-full space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
-                <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm shrink-0">
-                  <h2 className="text-xs font-black text-slate-900 uppercase tracking-tighter">Temporal Planning</h2>
-                  <p className="text-[9px] text-slate-400 font-medium mt-1 uppercase tracking-widest">Assign arrival and departure dates to calibrate your journey timeline.</p>
+              <div className="flex flex-col h-full space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
+                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm shrink-0">
+                  <h2 className="text-base font-black text-slate-900 uppercase tracking-tight">Step 2: Set Dates</h2>
+                  <p className="text-xs text-slate-400 font-medium mt-1">Assign arrival and departure dates for each destination.</p>
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-hide">
                    {stops.length === 0 ? (
                      <div className="text-center py-20 bg-white border border-dashed border-slate-200 rounded-2xl">
-                        <p className="text-slate-400 font-bold text-[9px] uppercase tracking-widest">Awaiting destination inputs</p>
+                        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Awaiting destination inputs</p>
                      </div>
                    ) : stops.map((e, i) => (
                      <div key={e.stop.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
                         <div className="flex items-center gap-3">
-                           <div className="h-7 w-7 rounded-lg bg-(--app-color-primary) text-white flex items-center justify-center text-[10px] font-black">{i + 1}</div>
-                           <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-tight">{e.city?.name}</h3>
+                           <div className="h-8 w-8 rounded-lg bg-(--app-color-primary) text-white flex items-center justify-center text-xs font-black">{i + 1}</div>
+                           <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">{e.city?.name}</h3>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="space-y-1.5">
-                            <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-1">Check-in</label>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Check-in</label>
                             <input 
                               type="date" 
                               value={toDateInput(e.stop.arrivalDate)} 
                               onChange={(ev) => handleDateChange(e.stop.id, 'arrivalDate', ev.target.value)} 
-                              className="w-full bg-slate-50 border-none rounded-xl h-10 px-4 text-[10px] focus:ring-1 focus:ring-(--app-color-primary) transition-all"
+                              className="w-full bg-slate-50 border-none rounded-xl h-10 px-4 text-xs focus:ring-1 focus:ring-(--app-color-primary) transition-all"
                             />
                           </div>
-                          <div className="space-y-1.5">
-                            <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-1">Check-out</label>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Check-out</label>
                             <input 
                               type="date" 
                               value={toDateInput(e.stop.departureDate)} 
                               onChange={(ev) => handleDateChange(e.stop.id, 'departureDate', ev.target.value)} 
-                              className="w-full bg-slate-50 border-none rounded-xl h-10 px-4 text-[10px] focus:ring-1 focus:ring-(--app-color-primary) transition-all"
+                              className="w-full bg-slate-50 border-none rounded-xl h-10 px-4 text-xs focus:ring-1 focus:ring-(--app-color-primary) transition-all"
                             />
                           </div>
                         </div>
@@ -289,9 +289,9 @@ export default function ItineraryBuilderPage() {
             )}
 
             {activeStep === 3 && (
-              <div className="flex flex-col h-full space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
+              <div className="flex flex-col h-full space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
                 <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm shrink-0">
-                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Step 3: Context Intelligence</h2>
+                  <h2 className="text-base font-black text-slate-900 uppercase tracking-tight">Step 3: AI Discovery</h2>
                   <Button onClick={async () => {
                       const stop = stops.find(x => x.stop.id === selectedStopId);
                       if (!stop) return;
@@ -301,18 +301,18 @@ export default function ItineraryBuilderPage() {
                         setActivityIdeas(r.data.data || []);
                       } catch { toast.error('Query failed.'); }
                       finally { setSearchingActivities(false); }
-                   }} loading={searchingActivities} size="xs" fullWidth className="mt-4 rounded-lg h-9 text-[9px] uppercase font-black">Execute Discovery Engine</Button>
+                   }} loading={searchingActivities} size="sm" fullWidth className="mt-4 rounded-xl h-10 text-xs uppercase font-black">Discover Experiences</Button>
                 </div>
-                <div className="flex gap-1.5 overflow-x-auto pb-2 shrink-0 scrollbar-hide">
+                <div className="flex gap-2 overflow-x-auto pb-2 shrink-0 scrollbar-hide">
                    {stops.map(e => (
-                     <button key={e.stop.id} onClick={() => setSelectedStopId(e.stop.id)} className={`shrink-0 px-4 py-2 rounded-lg font-bold text-[8px] uppercase tracking-widest transition-all ${selectedStopId === e.stop.id ? 'bg-(--app-color-primary) text-white shadow-md' : 'bg-white text-slate-400 border border-slate-100'}`}>{e.city?.name}</button>
+                     <button key={e.stop.id} onClick={() => setSelectedStopId(e.stop.id)} className={`shrink-0 px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${selectedStopId === e.stop.id ? 'bg-(--app-color-primary) text-white shadow-md' : 'bg-white text-slate-400 border border-slate-100'}`}>{e.city?.name}</button>
                    ))}
                 </div>
-                <div className="flex-1 overflow-y-auto grid sm:grid-cols-2 gap-2 pr-2 scrollbar-hide">
+                <div className="flex-1 overflow-y-auto grid sm:grid-cols-2 gap-3 pr-2 scrollbar-hide">
                    {activityIdeas.map((idea, i) => (
-                      <div key={i} className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between gap-2 hover:border-(--app-color-primary-soft) transition-all">
-                        <div className="min-w-0"><p className="font-bold text-slate-900 text-[9px] truncate leading-none mb-1">{idea.name}</p><p className="text-[7px] text-slate-400 uppercase font-black tracking-widest">{idea.type} • {idea.duration}</p></div>
-                        <button onClick={async () => { await activitiesService.create(tripId, selectedStopId, idea); toast.success('Added.'); }} className="h-6 w-6 rounded bg-slate-50 flex items-center justify-center text-slate-300 hover:text-(--app-color-primary) transition-all"><Plus size={12} /></button>
+                      <div key={i} className="p-4 rounded-xl bg-white border border-slate-100 flex items-center justify-between gap-3 hover:border-(--app-color-primary-soft) hover:shadow-sm transition-all">
+                        <div className="min-w-0"><p className="font-bold text-slate-900 text-sm truncate leading-none mb-1">{idea.name}</p><p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">{idea.type} • {idea.duration}</p></div>
+                        <button onClick={async () => { await activitiesService.create(tripId, selectedStopId, idea); toast.success('Added.'); }} className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-300 hover:text-(--app-color-primary) transition-all"><Plus size={16} /></button>
                       </div>
                    ))}
                 </div>
@@ -321,8 +321,8 @@ export default function ItineraryBuilderPage() {
 
           </div>
 
-          <button onClick={() => activeStep < 3 && setActiveStep(s => s + 1)} className={`absolute bottom-6 right-6 flex items-center gap-2 bg-(--app-color-primary) text-white pl-5 pr-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest shadow-xl transition-all ${activeStep === 3 ? 'opacity-0 pointer-events-none' : 'hover:scale-105 active:scale-95'}`}>
-            Next Step <div className="h-5 w-5 rounded-md bg-white/20 flex items-center justify-center"><ArrowRight size={10} /></div>
+          <button onClick={() => activeStep < 3 && setActiveStep(s => s + 1)} className={`absolute bottom-6 right-6 flex items-center gap-2.5 bg-(--app-color-primary) text-white pl-6 pr-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl transition-all ${activeStep === 3 ? 'opacity-0 pointer-events-none' : 'hover:scale-105 active:scale-95'}`}>
+            Next <div className="h-6 w-6 rounded-lg bg-white/20 flex items-center justify-center"><ArrowRight size={14} /></div>
           </button>
         </div>
 
@@ -349,15 +349,15 @@ export default function ItineraryBuilderPage() {
             if (!c) return null;
             return (
               <CircleMarker key={e.stop.id} center={[c.lat, c.lng]} radius={5} pathOptions={{ color: '#714B67', fillColor: '#714B67', fillOpacity: 1, weight: 1.5 }}>
-                <Popup className="custom-popup"><div className="p-2"><p className="font-black text-slate-900 text-[10px] mb-0.5">{e.city?.name}</p><p className="text-[7px] text-slate-400 uppercase font-black">{e.city?.country}</p></div></Popup>
+                <Popup className="custom-popup"><div className="p-3"><p className="font-black text-slate-900 text-sm mb-0.5">{e.city?.name}</p><p className="text-[10px] text-slate-400 uppercase font-bold">{e.city?.country}</p></div></Popup>
               </CircleMarker>
             );
           })}
         </MapContainer>
         <div className="absolute top-6 right-6">
-           <div className="bg-white/90 backdrop-blur-md p-4 px-6 rounded-2xl border border-white shadow-xl flex flex-col items-end min-w-[120px]">
-              <span className="text-[7px] font-black uppercase tracking-[0.2em] text-slate-400">Node Hub</span>
-              <p className="text-xl font-black text-slate-900 mt-0.5">{stops.length} ACTIVE</p>
+           <div className="bg-white/90 backdrop-blur-md p-5 px-7 rounded-2xl border border-white shadow-xl flex flex-col items-end min-w-[150px]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Route Status</span>
+              <p className="text-2xl font-black text-slate-900 mt-1">{stops.length} Stops</p>
            </div>
         </div>
       </div>

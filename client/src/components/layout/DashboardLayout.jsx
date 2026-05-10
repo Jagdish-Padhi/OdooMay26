@@ -41,10 +41,10 @@ function SidebarContent({ onNavigate, isCollapsed, onToggle }) {
       <div className="flex items-center justify-between px-6 py-5">
         {!isCollapsed && (
           <Link to="/" onClick={onNavigate} className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="Traveloop" className="h-10 w-10 object-contain" />
+            <img src="/logo.png" alt="Traveloop" className="h-14 w-14 object-contain transition-transform group-hover:scale-105" />
             <div className="flex items-baseline gap-0.5">
-              <span className="text-(--app-color-text) text-lg font-black uppercase tracking-tight">Trave</span>
-              <span className="text-lg font-black uppercase tracking-tight text-(--app-color-accent)">Loop</span>
+              <span className="text-(--app-color-text) text-xl font-black uppercase tracking-tighter">Trave</span>
+              <span className="text-xl font-black uppercase tracking-tighter text-(--app-color-accent)">Loop</span>
             </div>
           </Link>
         )}
@@ -110,7 +110,7 @@ export default function DashboardLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
-  const isBuilder = location.pathname.includes('/builder');
+  const isFlushMode = location.pathname.includes('/builder') || location.pathname.includes('/ai-planner');
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -148,9 +148,9 @@ export default function DashboardLayout() {
         </div>
       )}
 
-      <main className={`min-w-0 flex-1 transition-all duration-300 ${isBuilder ? 'bg-white' : ''}`}>
+      <main className={`min-w-0 flex-1 transition-all duration-300 ${isFlushMode ? 'bg-white' : ''}`}>
         <div className="h-14 lg:hidden" />
-        <div className={isBuilder ? 'h-full w-full' : 'px-4 py-6 sm:px-6 lg:px-8 lg:py-8 mx-auto max-w-7xl'}>
+        <div className={isFlushMode ? 'h-full w-full' : 'px-4 py-6 sm:px-6 lg:px-8 lg:py-8 mx-auto max-w-7xl'}>
           <Outlet />
         </div>
       </main>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import TripSelector from '../../components/TripSelector.jsx';
 import { ArrowRight, BarChart3, Bike, Briefcase, CalendarDays, Home, Utensils, TrendingUp, DollarSign, PieChart as PieIcon, Hotel, Car, Ticket, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -25,6 +26,7 @@ function formatMoney(value) {
 
 export default function BudgetPage() {
   const { tripId } = useParams();
+  const navigate = useNavigate();
   const [trip, setTrip] = useState(null);
   const [budget, setBudget] = useState(null);
   const [stops, setStops] = useState([]);
@@ -88,14 +90,12 @@ export default function BudgetPage() {
 
   if (!tripId) {
     return (
-      <div className="mx-auto max-w-3xl space-y-6 pb-12">
-        <PageHeader
+      <div className="mx-auto max-w-4xl space-y-8 pb-12">
+        <TripSelector 
           title="Financial Planning"
-          subtitle="Open a specific trip to see the budget engine in action."
+          subtitle="Choose a trip to view its automatic budget breakdown and cost estimations."
+          onSelect={(id) => navigate(`/trips/${id}/budget`)}
         />
-        <Card className="p-8 text-center">
-          <p className="text-sm text-(--app-color-text-muted)">Budget calculations are trip-specific. Open a trip from the Trips page or the itinerary builder.</p>
-        </Card>
       </div>
     );
   }
