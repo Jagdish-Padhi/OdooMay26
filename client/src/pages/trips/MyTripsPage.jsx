@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
+import { TripCardSkeleton } from '../../components/skeletons/TripCardSkeleton.jsx';
+import { NoTripsEmptyState } from '../../components/EmptyStates.jsx';
 import useTripsStore from '../../store/trips.store.js';
 
 function formatDateRange(startDate, endDate) {
@@ -57,26 +59,11 @@ export default function MyTripsPage() {
       />
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-(--app-color-primary) border-t-transparent" />
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {[...Array(6)].map((_, i) => <TripCardSkeleton key={i} />)}
         </div>
       ) : trips.length === 0 ? (
-        <Card className="p-10 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-(--app-color-primary-soft) text-(--app-color-primary)">
-            <MapPin size={24} />
-          </div>
-          <h2 className="text-xl font-bold text-(--app-color-text)">No trips yet</h2>
-          <p className="mt-2 text-sm text-(--app-color-text-muted)">Start by creating your first trip, then build out the itinerary later.</p>
-          <div className="mt-6 flex justify-center gap-3">
-            <Button onClick={() => navigate('/trips/new')}>
-              <Plus size={16} />
-              Create trip
-            </Button>
-            <Button variant="secondary" onClick={() => navigate('/discover')}>
-              Browse cities
-            </Button>
-          </div>
-        </Card>
+        <NoTripsEmptyState />
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {trips.map((trip) => (

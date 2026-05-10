@@ -1,190 +1,271 @@
-import { useState, useEffect } from 'react';
-import { 
-  FileText, 
-  Plus, 
-  Search, 
-  Calendar, 
-  MapPin, 
-  MoreVertical,
-  Trash2,
-  Edit3
-} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { CalendarDays, MapPin, PencilLine, Plus, Search, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-import PageHeader from '../../components/PageHeader';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
-import Input from '../../components/Input';
-import Modal from '../../components/Modal';
+import Button from '../../components/Button.jsx';
+import Card from '../../components/Card.jsx';
+import Input from '../../components/Input.jsx';
+import Modal from '../../components/Modal.jsx';
+import PageHeader from '../../components/PageHeader.jsx';
+import { FormSkeleton } from '../../components/skeletons/FormSkeleton.jsx';
+import { EmptyNotesState } from '../../components/EmptyStates.jsx';
+import { notesService } from '../../services/notes.service.js';
+import { stopsService } from '../../services/stops.service.js';
+import { tripsService } from '../../services/trips.service.js';
 
 export default function NotesPage() {
+  const { tripId } = useParams();
+  const [trip, setTrip] = useState(null);
+  const [stops, setStops] = useState([]);
   const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(Boolean(tripId));
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentNote, setCurrentNote] = useState({ title: '', content: '', tripName: '', stopName: '' });
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [draft, setDraft] = useState({ content: '', stopId: '' });
+  const [selectedStopFilter, setSelectedStopFilter] = useState('all');
 
-  // Mock data for demo
   useEffect(() => {
-    setNotes([
-      { 
-        id: '1', 
-        title: 'Hidden Cafe in Kyoto', 
-        content: 'Found this amazing place called "Kurasu" near the station. Best pour-over ever. Must visit again.',
-        tripName: 'Spring in Japan',
-        stopName: 'Kyoto',
-        createdAt: new Date().toISOString()
-      },
-      { 
-        id: '2', 
-        title: 'Train Tickets Info', 
-        content: 'JR Pass needs to be exchanged at the airport. Keep the physical voucher safe!',
-        tripName: 'Spring in Japan',
-        stopName: 'Tokyo',
-        createdAt: new Date(Date.now() - 86400000).toISOString()
+    let alive = true;
+
+    async function load() {
+      if (!tripId) {
+        setLoading(false);
+        return;
       }
-    ]);
-  }, []);
 
-  const filteredNotes = notes.filter(n => 
-    n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    n.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      setLoading(true);
+      try {
+        const [tripResponse, stopsResponse, notesResponse] = await Promise.all([
+          tripsService.getOne(tripId),
+          stopsService.getAll(tripId),
+          notesService.getAll(tripId),
+        ]);
 
-  const handleSaveNote = () => {
-    if (!currentNote.title || !currentNote.content) return;
-    
-    const newNote = {
-      ...currentNote,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+        if (!alive) return;
+
+        setTrip(tripResponse.data.data);
+        setStops(stopsResponse.data.data || []);
+        setNotes(notesResponse.data.data || []);
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to load notes.');
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+
+    load();
+
+    return () => {
+      alive = false;
     };
-    
-    setNotes([newNote, ...notes]);
-    setIsModalOpen(false);
-    setCurrentNote({ title: '', content: '', tripName: '', stopName: '' });
-    toast.success('Note saved to journal');
-  };
+  }, [tripId]);
 
-  const deleteNote = (id) => {
-    setNotes(notes.filter(n => n.id !== id));
-    toast.success('Note deleted');
-  };
+  const filteredNotes = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return notes.filter((note) => {
+      const matchesText = !query || note.content.toLowerCase().includes(query);
+      const matchesStop = selectedStopFilter === 'all' || note.stopId === selectedStopFilter;
+      return matchesText && matchesStop;
+    });
+  }, [notes, searchQuery, selectedStopFilter]);
+
+  function openCreateModal() {
+    setDraft({ content: '', stopId: selectedStopFilter === 'all' ? '' : selectedStopFilter });
+    setEditingNoteId(null);
+    setIsModalOpen(true);
+  }
+
+  function openEditModal(note) {
+    setDraft({ content: note.content, stopId: note.stopId || '' });
+    setEditingNoteId(note.id);
+    setIsModalOpen(true);
+  }
+
+  async function saveNote() {
+    const content = draft.content.trim();
+    if (!tripId || !content) return;
+
+    try {
+      if (editingNoteId) {
+        const response = await notesService.update(tripId, editingNoteId, {
+          content,
+          stopId: draft.stopId || null,
+        });
+        const updated = response.data.data;
+        setNotes((current) => current.map((note) => (note.id === editingNoteId ? updated : note)));
+        toast.success('Note updated.');
+      } else {
+        const response = await notesService.create(tripId, {
+          content,
+          stopId: draft.stopId || null,
+        });
+        setNotes((current) => [response.data.data, ...current]);
+        toast.success('Note saved.');
+      }
+
+      setIsModalOpen(false);
+      setEditingNoteId(null);
+      setDraft({ content: '', stopId: '' });
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to save note.');
+    }
+  }
+
+  async function deleteNote(noteId) {
+    try {
+      await notesService.remove(tripId, noteId);
+      setNotes((current) => current.filter((note) => note.id !== noteId));
+      toast.success('Note deleted.');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete note.');
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-6 pb-12">
+        <FormSkeleton />
+      </div>
+    );
+  }
+
+  if (!tripId) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-6 pb-12">
+        <PageHeader
+          title="Trip Journal"
+          subtitle="Open a specific trip to capture notes tied to that itinerary."
+        />
+        <Card className="p-8 text-center">
+          <p className="text-sm text-(--app-color-text-muted)">Trip notes are saved per trip, and can also be attached to a specific stop.</p>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!trip) return null;
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 pb-12">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <PageHeader 
-          title="Trip Journal" 
-          subtitle="Capture moments, save discoveries, and keep important logs."
+        <PageHeader
+          title={`${trip.name} Journal`}
+          subtitle="Capture moments, save discoveries, and keep location-specific notes linked to your trip."
           className="mb-0"
         />
-        <Button onClick={() => setIsModalOpen(true)} className="sm:w-auto">
-          <Plus size={20} />
+        <Button onClick={openCreateModal} className="sm:w-auto">
+          <Plus size={18} />
           New Note
         </Button>
       </div>
 
-      {/* Search & Stats */}
-      <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+      <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-          <input 
-            type="text" 
-            placeholder="Search your notes..."
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search notes..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(event) => setSearchQuery(event.target.value)}
             className="h-14 w-full rounded-[1.25rem] border border-(--app-color-border) bg-white pl-12 pr-6 text-sm font-medium transition-all focus:border-(--app-color-primary) focus:ring-4 focus:ring-(--app-color-primary-soft)"
           />
         </div>
-        <div className="flex items-center gap-4 rounded-[1.25rem] border border-(--app-color-border) bg-white px-6 py-4">
-          <div className="text-center">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-(--app-color-text-muted)">Total Entries</p>
-            <p className="text-lg font-black text-(--app-color-primary)">{notes.length}</p>
-          </div>
-        </div>
+
+        <label className="block rounded-[1.25rem] border border-(--app-color-border) bg-white px-4 py-3 text-sm font-medium text-(--app-color-text)">
+          Stop filter
+          <select
+            value={selectedStopFilter}
+            onChange={(event) => setSelectedStopFilter(event.target.value)}
+            className="mt-2 w-full rounded-lg border border-(--app-color-border) bg-white px-3 py-2 text-sm"
+          >
+            <option value="all">All stops</option>
+            {stops.map((stop) => (
+              <option key={stop.stop.id} value={stop.stop.id}>
+                {stop.city?.name || 'Unknown city'}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
-      {/* Notes Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredNotes.map(note => (
-          <Card key={note.id} className="group relative flex flex-col p-6 transition-all hover:shadow-xl hover:-translate-y-1 border-none bg-white">
-            <div className="mb-4 flex items-start justify-between">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-(--app-color-primary-soft) text-(--app-color-primary)">
-                <FileText size={20} />
-              </div>
-              <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                <button className="p-1 text-slate-400 hover:text-(--app-color-primary)"><Edit3 size={16} /></button>
-                <button onClick={() => deleteNote(note.id)} className="p-1 text-slate-400 hover:text-red-500"><Trash2 size={16} /></button>
-              </div>
-            </div>
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {filteredNotes.map((note) => {
+          const stop = stops.find((entry) => entry.stop.id === note.stopId);
 
-            <h3 className="mb-2 text-lg font-bold text-(--app-color-text) line-clamp-1">{note.title}</h3>
-            <p className="mb-6 flex-1 text-sm leading-relaxed text-(--app-color-text-muted) line-clamp-3">
-              {note.content}
-            </p>
-
-            <div className="mt-auto space-y-2 pt-4 border-t border-slate-50">
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                <MapPin size={12} className="text-(--app-color-accent)" />
-                {note.tripName} • {note.stopName}
+          return (
+            <Card key={note.id} className="group relative flex flex-col p-6 transition-all hover:-translate-y-1 hover:shadow-xl border-none bg-white">
+              <div className="mb-4 flex items-start justify-between">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-(--app-color-primary-soft) text-(--app-color-primary)">
+                  <CalendarDays size={18} />
+                </div>
+                <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  <button type="button" onClick={() => openEditModal(note)} className="p-1 text-slate-400 hover:text-(--app-color-primary)">
+                    <PencilLine size={16} />
+                  </button>
+                  <button type="button" onClick={() => deleteNote(note.id)} className="p-1 text-slate-400 hover:text-red-500">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                <Calendar size={12} />
-                {new Date(note.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </div>
-            </div>
-          </Card>
-        ))}
 
-        {filteredNotes.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center py-20 text-center opacity-40">
-            <FileText size={64} strokeWidth={1} />
-            <p className="mt-4 text-lg font-bold">No entries found</p>
-            <p className="text-sm">Capture your travel thoughts by creating a new note.</p>
-          </div>
-        )}
+              <p className="mb-6 flex-1 whitespace-pre-wrap text-sm leading-relaxed text-(--app-color-text)">{note.content}</p>
+
+              <div className="mt-auto space-y-2 border-t border-slate-50 pt-4">
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <MapPin size={12} className="text-(--app-color-accent)" />
+                  {stop?.city?.name || 'Trip note'}
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <CalendarDays size={12} />
+                  {new Date(note.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+
+        {filteredNotes.length === 0 && <EmptyNotesState />}
       </div>
 
-      {/* New Note Modal */}
-      <Modal 
-        isOpen={isModalOpen} 
+      <Modal
+        isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add to Journal"
+        title={editingNoteId ? 'Edit Note' : 'Add to Journal'}
       >
         <div className="space-y-6">
-          <Input 
-            label="Entry Title" 
-            placeholder="e.g. Best Gelato in Rome"
-            value={currentNote.title}
-            onChange={(e) => setCurrentNote({ ...currentNote, title: e.target.value })}
-          />
           <div className="space-y-1.5">
             <label className="text-xs font-bold uppercase tracking-widest text-(--app-color-text-muted)">Content</label>
-            <textarea 
+            <textarea
               rows={5}
               placeholder="What happened? What did you discover?"
-              value={currentNote.content}
-              onChange={(e) => setCurrentNote({ ...currentNote, content: e.target.value })}
+              value={draft.content}
+              onChange={(event) => setDraft((current) => ({ ...current, content: event.target.value }))}
               className="w-full rounded-2xl border border-(--app-color-border) p-4 text-sm focus:border-(--app-color-primary) focus:ring-4 focus:ring-(--app-color-primary-soft)"
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Input 
-              label="Trip" 
-              placeholder="e.g. Europe 2026"
-              value={currentNote.tripName}
-              onChange={(e) => setCurrentNote({ ...currentNote, tripName: e.target.value })}
-            />
-            <Input 
-              label="Location (Optional)" 
-              placeholder="e.g. Rome"
-              value={currentNote.stopName}
-              onChange={(e) => setCurrentNote({ ...currentNote, stopName: e.target.value })}
-            />
-          </div>
+
+          <label className="block text-sm font-medium text-(--app-color-text)">
+            Attach to stop
+            <select
+              value={draft.stopId}
+              onChange={(event) => setDraft((current) => ({ ...current, stopId: event.target.value }))}
+              className="mt-2 w-full rounded-lg border border-(--app-color-border) bg-white px-3 py-2 text-sm"
+            >
+              <option value="">Trip-wide note</option>
+              {stops.map((stop) => (
+                <option key={stop.stop.id} value={stop.stop.id}>
+                  {stop.city?.name || 'Unknown city'}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <div className="flex justify-end gap-3 pt-4">
             <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveNote}>Save Entry</Button>
+            <Button onClick={saveNote}>{editingNoteId ? 'Update Entry' : 'Save Entry'}</Button>
           </div>
         </div>
       </Modal>

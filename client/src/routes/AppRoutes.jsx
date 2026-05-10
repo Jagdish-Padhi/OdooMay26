@@ -13,11 +13,13 @@ import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage.jsx';
 import MyTripsPage from '../pages/trips/MyTripsPage.jsx';
 import CreateTripPage from '../pages/trips/CreateTripPage.jsx';
 import CitySearchPage from '../pages/search/CitySearchPage.jsx';
+import ActivitySearchPage from '../pages/search/ActivitySearchPage.jsx';
 import PackingPage from '../pages/trips/PackingPage.jsx';
 import NotesPage from '../pages/trips/NotesPage.jsx';
 import BudgetPage from '../pages/trips/BudgetPage.jsx';
 import SharedTripPage from '../pages/trips/SharedTripPage.jsx';
 import ItineraryBuilderPage from '../pages/trips/ItineraryBuilderPage.jsx';
+import ItineraryViewPage from '../pages/trips/ItineraryViewPage.jsx';
 import AiPlannerPage from '../pages/dashboard/AiPlannerPage.jsx';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage.jsx';
 import ReportsPage from '../pages/dashboard/ReportsPage.jsx';
@@ -69,7 +71,12 @@ export default function AppRoutes() {
             <Route path="/trips" element={<MyTripsPage />} />
             <Route path="/trips/new" element={<CreateTripPage />} />
             <Route path="/trips/:tripId/builder" element={<ItineraryBuilderPage />} />
+            <Route path="/trips/:tripId/view" element={<ItineraryViewPage />} />
+            <Route path="/trips/:tripId/budget" element={<BudgetPage />} />
+            <Route path="/trips/:tripId/packing" element={<PackingPage />} />
+            <Route path="/trips/:tripId/notes" element={<NotesPage />} />
             <Route path="/discover" element={<CitySearchPage />} />
+            <Route path="/discover/activities" element={<ActivitySearchPage />} />
             <Route path="/dashboard/packing" element={<PackingPage />} />
             <Route path="/dashboard/notes" element={<NotesPage />} />
             <Route path="/dashboard/budget" element={<BudgetPage />} />

@@ -6,6 +6,7 @@ import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
 import StatCard from '../../components/StatCard.jsx';
+import { DashboardSkeleton } from '../../components/skeletons/DashboardSkeleton.jsx';
 import { citiesService } from '../../services/cities.service.js';
 import useTripsStore from '../../store/trips.store.js';
 import useAuthStore from '../../store/auth.store.js';
@@ -66,11 +67,7 @@ export default function DashboardHomePage() {
         )}
       />
 
-      {loading && trips.length === 0 ? (
-        <div className="flex justify-center py-12">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-(--app-color-primary) border-t-transparent" />
-        </div>
-      ) : null}
+      {loading && trips.length === 0 ? <DashboardSkeleton /> : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
