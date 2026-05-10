@@ -52,8 +52,8 @@ export async function addStop(tripId, data) {
     .values({
       tripId,
       cityId: data.cityId,
-      arrivalDate: data.arrivalDate ?? null,
-      departureDate: data.departureDate ?? null,
+      arrivalDate: data.arrivalDate ? new Date(data.arrivalDate) : null,
+      departureDate: data.departureDate ? new Date(data.departureDate) : null,
       order,
     })
     .returning();
@@ -63,9 +63,14 @@ export async function addStop(tripId, data) {
 
 export async function updateStop(tripId, stopId, data) {
   const db = getDb();
+  const updateData = { ...data, updatedAt: new Date() };
+  
+  if (data.arrivalDate) updateData.arrivalDate = new Date(data.arrivalDate);
+  if (data.departureDate) updateData.departureDate = new Date(data.departureDate);
+
   const [updated] = await db
     .update(stops)
-    .set({ ...data, updatedAt: new Date() })
+    .set(updateData)
     .where(and(eq(stops.id, stopId), eq(stops.tripId, tripId)))
     .returning();
 

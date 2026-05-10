@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   BarChart3, Compass, LayoutDashboard, LogOut,
   MapPinned, Menu, PlusCircle, Search,
-  Sparkles, User as UserIcon, X,
+  Sparkles, User as UserIcon, X, CheckSquare, FileText, DollarSign, Sparkles, BarChart3, Archive
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -11,14 +11,19 @@ import api from '../../services/api.js';
 import useAuthStore from '../../store/auth.store.js';
 
 const navigationItems = [
-  { label: 'Overview',       path: '/dashboard',              icon: LayoutDashboard },
-  { label: 'My Trips',       path: '/trips',                  icon: MapPinned },
-  { label: 'New Trip',       path: '/trips/new',              icon: PlusCircle },
-  { label: 'Discover',       path: '/discover',               icon: Compass },
   { label: 'Activities',     path: '/discover/activities',    icon: Search },
-  { label: 'AI Planner',     path: '/dashboard/ai-planner',  icon: Sparkles },
   { label: 'Profile',        path: '/dashboard/profile',      icon: UserIcon },
-  { label: 'Admin',          path: '/dashboard/admin',        icon: BarChart3 },
+  { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'My Trips', path: '/trips', icon: MapPinned },
+  { label: 'New Trip', path: '/trips/new', icon: PlusCircle },
+  { label: 'Discover', path: '/discover', icon: Compass },
+  { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
+  { label: 'AI Assistant', path: '/dashboard/ai-planner', icon: Sparkles },
+  { label: 'Budget', path: '/dashboard/budget', icon: DollarSign },
+  { label: 'Reports Gallery', path: '/dashboard/reports', icon: Archive },
+  { label: 'Packing List', path: '/dashboard/packing', icon: CheckSquare },
+  { label: 'Trip Notes', path: '/dashboard/notes', icon: FileText },
+  { label: 'Admin', path: '/dashboard/admin', icon: BarChart3 },
 ];
 
 function SidebarContent({ onNavigate }) {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ArrowRight, BarChart3, Bike, Briefcase, CalendarDays, Home, Utensils } from 'lucide-react';
+import { ArrowRight, BarChart3, Bike, Briefcase, CalendarDays, Home, Utensils, TrendingUp, DollarSign, PieChart as PieIcon, Hotel, Car, Ticket, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import Card from '../../components/Card.jsx';
@@ -10,6 +10,7 @@ import Button from '../../components/Button.jsx';
 import { FormSkeleton } from '../../components/skeletons/FormSkeleton.jsx';
 import { tripsService } from '../../services/trips.service.js';
 import { stopsService } from '../../services/stops.service.js';
+import useDownloadStore from '../../store/download.store.js';
 
 const BREAKDOWN_META = {
   accommodation: { label: 'Accommodation', icon: Home, color: 'bg-indigo-500' },
@@ -28,7 +29,9 @@ export default function BudgetPage() {
   const [budget, setBudget] = useState(null);
   const [stops, setStops] = useState([]);
   const [loading, setLoading] = useState(Boolean(tripId));
-
+  const [budgetData, setBudgetData] = useState(null);
+  const startDownload = useDownloadStore(s => s.startDownload);
+  
   useEffect(() => {
     let alive = true;
 
@@ -164,10 +167,22 @@ export default function BudgetPage() {
                   <p className="text-sm font-black text-(--app-color-text)">{formatMoney(stop.accommodation + stop.food + stop.transport)}</p>
                   <p className="text-[10px] uppercase tracking-widest text-(--app-color-text-muted)">city subtotal</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+              ))}
+            </div>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-(--app-color-primary) to-(--app-color-accent) p-8 text-white">
+            <h4 className="mb-2 text-lg font-bold">Ready to travel?</h4>
+            <p className="mb-6 text-sm text-white/80">Export this budget as a CSV or PDF for your travel group.</p>
+            <Button 
+              variant="tertiary" 
+              className="w-full bg-white/10 text-white hover:bg-white/20"
+              onClick={() => startDownload('Full Budget Report')}
+            >
+              Download Report
+            </Button>
+          </Card>
+        </div>
       </div>
     </div>
   );

@@ -68,8 +68,8 @@ export async function createTrip(userId, data) {
     .values({
       userId,
       name: data.name,
-      startDate: data.startDate,
-      endDate: data.endDate,
+      startDate: new Date(data.startDate),
+      endDate: new Date(data.endDate),
       description: data.description ?? null,
       coverPhoto: data.coverPhoto ?? null,
       isPublic: data.isPublic ?? false,
@@ -178,9 +178,14 @@ export async function duplicateTrip(tripId, targetUserId) {
 
 export async function updateTrip(tripId, userId, data) {
   const db = getDb();
+  
+  const updateData = { ...data, updatedAt: new Date() };
+  if (data.startDate) updateData.startDate = new Date(data.startDate);
+  if (data.endDate) updateData.endDate = new Date(data.endDate);
+
   const [updated] = await db
     .update(trips)
-    .set({ ...data, updatedAt: new Date() })
+    .set(updateData)
     .where(and(eq(trips.id, tripId), eq(trips.userId, userId)))
     .returning();
   return updated || null;
