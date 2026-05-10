@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
 
 import { getDb } from '../db/index.js';
 import { stops, trips, activities } from '../db/schema/index.js';
@@ -59,6 +59,27 @@ async function loadTripStopsWithActivities(tripId) {
     ...stop,
     activities: activitiesByStop.get(stop.id) ?? [],
   }));
+}
+
+export async function getTripContextById(tripId, userId = null) {
+  const db = getDb();
+  const [trip] = await db
+    .select()
+    .from(trips)
+    .where(eq(trips.id, tripId));
+
+  if (!trip) return null;
+  if (!trip.isPublic && trip.userId !== userId) return null;
+
+  const [enrichedTrip] = await attachDestinationCounts([trip]);
+  if (!enrichedTrip) return null;
+
+  const stopsWithActivities = await loadTripStopsWithActivities(tripId);
+
+  return {
+    ...enrichedTrip,
+    stops: stopsWithActivities,
+  };
 }
 
 export async function createTrip(userId, data) {
