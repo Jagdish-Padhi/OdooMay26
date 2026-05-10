@@ -10,6 +10,7 @@
     "dev": "nodemon --watch src --watch .env src/index.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node --input-type=module -e \"import('./src/db/seed/cities.seed.js').then((m) => m.seedCities())\"",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "lint": "eslint .",
