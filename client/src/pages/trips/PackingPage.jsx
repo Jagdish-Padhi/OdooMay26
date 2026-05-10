@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import TripSelector from '../../components/TripSelector.jsx';
 import { CheckCircle2, Circle, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -34,6 +35,7 @@ const CATEGORY_STYLES = {
 
 export default function PackingPage() {
   const { tripId } = useParams();
+  const navigate = useNavigate();
   const [trip, setTrip] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(Boolean(tripId));
@@ -144,14 +146,12 @@ export default function PackingPage() {
 
   if (!tripId) {
     return (
-      <div className="mx-auto max-w-3xl space-y-6 pb-12">
-        <PageHeader
+      <div className="mx-auto max-w-4xl space-y-8 pb-12">
+        <TripSelector 
           title="Packing Checklist"
-          subtitle="Open a specific trip to manage its packing list."
+          subtitle="Select a trip to organize your essentials and track your packing progress."
+          onSelect={(id) => navigate(`/trips/${id}/packing`)}
         />
-        <Card className="p-8 text-center">
-          <p className="text-sm text-(--app-color-text-muted)">Packing items are trip-specific, so choose a trip from the Trips page or the itinerary builder.</p>
-        </Card>
       </div>
     );
   }
