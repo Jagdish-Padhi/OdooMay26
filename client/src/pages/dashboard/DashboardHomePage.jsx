@@ -27,12 +27,16 @@ export default function DashboardHomePage() {
   const [featuredCities, setFeaturedCities] = useState([]);
 
   useEffect(() => {
+    if (user?.role === 'admin') {
+      navigate('/dashboard/admin', { replace: true });
+      return;
+    }
     fetchTrips();
     citiesService
       .search({ limit: 6 })
       .then((response) => setFeaturedCities(response.data.data))
       .catch(() => setFeaturedCities([]));
-  }, [fetchTrips]);
+  }, [fetchTrips, user?.role, navigate]);
 
   const stats = useMemo(() => {
     const activeTrips = trips.filter((trip) => trip.status !== 'completed');

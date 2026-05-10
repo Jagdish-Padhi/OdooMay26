@@ -13,7 +13,7 @@
     "db:seed": "node -r dotenv/config --input-type=module -e \"import('./src/db/seed/cities.seed.js').then((m) => m.seedCities())\"",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "lint": "eslint .",
+    "lint": "eslint . --config eslint.config.mjs",
     "format": "prettier --write ."
   },
   "dependencies": {

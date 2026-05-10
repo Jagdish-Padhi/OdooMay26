@@ -32,6 +32,15 @@ function PrivateRoute() {
   return isLoggedIn ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
+function AdminRoute() {
+  const { isLoggedIn, user } = useAuthStore();
+  
+  if (!isLoggedIn) return <Navigate to="/login" replace />;
+  if (user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  
+  return <Outlet />;
+}
+
 export default function AppRoutes() {
   const location = useLocation();
   const hydrated = useAuthStore((s) => s.hydrated);
@@ -81,7 +90,9 @@ export default function AppRoutes() {
             <Route path="/dashboard/notes" element={<NotesPage />} />
             <Route path="/dashboard/budget" element={<BudgetPage />} />
             <Route path="/dashboard/ai-planner" element={<AiPlannerPage />} />
-            <Route path="/dashboard/admin" element={<AdminDashboardPage />} />
+            <Route element={<AdminRoute />}>
+              <Route path="/dashboard/admin" element={<AdminDashboardPage />} />
+            </Route>
             <Route path="/dashboard/reports" element={<ReportsPage />} />
           </Route>
         </Route>

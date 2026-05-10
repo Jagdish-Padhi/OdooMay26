@@ -205,7 +205,7 @@ export default function LandingPage() {
                 <div className="flex-1 bg-slate-50 border border-(--app-color-border) px-4 py-2.5 rounded-xl text-xs truncate text-(--app-color-text-muted)">
                   traveloop.com/itinerary/luxury-alps
                 </div>
-                <button className="p-2.5 border border-(--app-color-primary) text-(--app-color-primary) rounded-xl hover:bg-(--app-color-primary) hover:!text-white transition-colors">
+                <button className="p-2.5 border border-(--app-color-primary) text-(--app-color-primary) rounded-xl hover:bg-(--app-color-primary) hover:text-white transition-colors">
                   <Copy size={16} />
                 </button>
               </div>
