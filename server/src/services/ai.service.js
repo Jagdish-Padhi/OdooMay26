@@ -3,17 +3,14 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const API_KEY = process.env.GEMINI_API_KEY;
 const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
-/**
- * Phase 6: AI Intelligence
- * Uses Google Gemini to generate a structured itinerary.
- */
+const MODEL_NAME = "gemini-1.5-flash";
+
 export async function generateAiItinerary({ city, country, duration, budget, preferences }) {
   if (!genAI) {
-    // Fallback Mock for demo if no API key is provided
     return mockItinerary(city, country, duration);
   }
 
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
   const prompt = `
     Generate a detailed travel itinerary for a trip to ${city}, ${country}.
@@ -37,18 +34,17 @@ export async function generateAiItinerary({ city, country, duration, budget, pre
     }
     
     Ensure the total duration of stops matches ${duration} days.
-    Keep the JSON strictly formatted.
+    Keep the JSON strictly formatted. No markdown, no code fences.
   `;
 
   try {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    
-    // Extract JSON if AI includes markdown code blocks
+
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('Invalid AI response format');
-    
+
     return JSON.parse(jsonMatch[0]);
   } catch (error) {
     console.error('AI Generation Error:', error);
@@ -61,7 +57,8 @@ export async function generateActivityIdeas({ city, country, type, budget, durat
     return mockActivityIdeas({ city, type, budget, duration, limit });
   }
 
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
   const prompt = `
     Generate ${limit} travel activity ideas for ${city}, ${country || 'any country'}.
     Filters:
@@ -77,6 +74,7 @@ export async function generateActivityIdeas({ city, country, type, budget, durat
     }
 
     Make sure the ideas feel realistic for the destination and match the filters as closely as possible.
+    No markdown, no code fences.
   `;
 
   try {
@@ -106,10 +104,10 @@ function mockItinerary(city, country, duration) {
         activities: [
           { name: `Explore Old Town ${city}`, type: 'sightseeing', cost: 0, duration: '3 hours', notes: 'Best visited early morning.' },
           { name: 'Local Food Tour', type: 'food', cost: 45, duration: '2 hours', notes: 'Try the street specialties.' },
-          { name: 'Sunset Viewpoint', type: 'relaxation', cost: 10, duration: '1 hour', notes: 'Great for photos.' }
-        ]
-      }
-    ]
+          { name: 'Sunset Viewpoint', type: 'relaxation', cost: 10, duration: '1 hour', notes: 'Great for photos.' },
+        ],
+      },
+    ],
   };
 }
 
@@ -126,11 +124,9 @@ function mockActivityIdeas({ city, type, budget, duration, limit }) {
   ];
 
   const costFilter = budget === 'low' ? 20 : budget === 'medium' ? 60 : Infinity;
-  const durationFilter = String(duration || '').toLowerCase();
 
   return baseIdeas
     .filter((idea) => !type || type === 'any' || idea.type === type)
     .filter((idea) => idea.cost <= costFilter)
-    .filter((idea) => !durationFilter || durationFilter === 'any' || idea.duration.toLowerCase().includes(durationFilter) || durationFilter.includes('any'))
     .slice(0, limit);
 }
