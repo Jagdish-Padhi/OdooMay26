@@ -1,4 +1,4 @@
-import { count, desc, eq, sql } from 'drizzle-orm';
+import { and, count, desc, eq, ilike, or, sql } from 'drizzle-orm';
 import { getDb } from '../db/index.js';
 import { activities, auditLogs, cities, reports, stops, trips, users } from '../db/schema/index.js';
 import { logAdminAction } from './audit.service.js';
@@ -13,7 +13,15 @@ export async function getPlatformStats() {
   const [userCount] = await db.select({ value: count() }).from(users);
   const [tripCount] = await db.select({ value: count() }).from(trips);
   const [activityCount] = await db.select({ value: count() }).from(activities);
-  const [reportCount] = await db.select({ value: count() }).from(reports).where(eq(reports.status, 'pending'));
+  
+  // Safely handle missing reports table if SQL hasn't been run yet
+  let reportCountValue = 0;
+  try {
+    const [reportCount] = await db.select({ value: count() }).from(reports).where(eq(reports.status, 'pending'));
+    reportCountValue = Number(reportCount.value);
+  } catch (e) {
+    console.warn('Reports table may not exist yet:', e.message);
+  }
   
   // Popular cities based on trip stops
   const popularCities = await db
@@ -52,13 +60,13 @@ export async function getPlatformStats() {
 
   return {
     summary: [
-      { label: 'Total Explorers', value: userCount.value, change: '+12%', trend: 'up' },
-      { label: 'Trips Planned', value: tripCount.value, change: '+24%', trend: 'up' },
-      { label: 'Activity Ideas', value: activityCount.value, change: '+8%', trend: 'up' },
-      { label: 'Pending Reports', value: reportCount.value, change: '-2', trend: 'down' },
+      { label: 'Total Explorers', value: Number(userCount.value), change: '+12%', trend: 'up' },
+      { label: 'Trips Planned', value: Number(tripCount.value), change: '+24%', trend: 'up' },
+      { label: 'Activity Ideas', value: Number(activityCount.value), change: '+8%', trend: 'up' },
+      { label: 'Pending Reports', value: reportCountValue, change: '-2', trend: 'down' },
     ],
     userGrowth,
-    popularCities: popularCities.length > 0 ? popularCities : [
+    popularCities: popularCities.length > 0 ? popularCities.map(c => ({ ...c, count: Number(c.count) })) : [
       { name: 'Tokyo', country: 'Japan', count: 42 },
       { name: 'Paris', country: 'France', count: 38 },
       { name: 'New York', country: 'USA', count: 35 },
@@ -79,15 +87,15 @@ export async function getAllUsers({ page = 1, limit = 10, search = '', role } = 
   const db = getDb();
   const offset = (page - 1) * limit;
 
-  const whereClause = [];
+  const filters = [];
   if (search) {
-    whereClause.push(sql`(${users.name} ILIKE ${'%' + search + '%'} OR ${users.email} ILIKE ${'%' + search + '%'})`);
+    filters.push(or(ilike(users.name, `%${search}%`), ilike(users.email, `%${search}%`)));
   }
   if (role) {
-    whereClause.push(eq(users.role, role));
+    filters.push(eq(users.role, role));
   }
 
-  const finalWhere = whereClause.length > 0 ? sql`${sql.join(whereClause, sql` AND `)}` : undefined;
+  const whereClause = filters.length > 0 ? and(...filters) : undefined;
 
   const userList = await db
     .select({
@@ -95,24 +103,25 @@ export async function getAllUsers({ page = 1, limit = 10, search = '', role } = 
       name: users.name,
       email: users.email,
       role: users.role,
-      status: users.status,
       createdAt: users.createdAt,
     })
     .from(users)
-    .where(finalWhere)
+    .where(whereClause)
     .limit(limit)
     .offset(offset)
     .orderBy(desc(users.createdAt));
 
-  const [totalCount] = await db
+  const [totalResult] = await db
     .select({ value: count() })
     .from(users)
-    .where(finalWhere);
+    .where(whereClause);
+
+  const total = Number(totalResult?.value || 0);
 
   return {
     users: userList,
-    total: totalCount.value,
-    pages: Math.ceil(totalCount.value / limit)
+    total,
+    pages: Math.ceil(total / limit)
   };
 }
 
