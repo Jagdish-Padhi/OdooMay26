@@ -41,10 +41,10 @@ function SidebarContent({ onNavigate, isCollapsed, onToggle }) {
       <div className="flex items-center justify-between px-6 py-5">
         {!isCollapsed && (
           <Link to="/" onClick={onNavigate} className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="Traveloop" className="h-10 w-10 object-contain" />
+            <img src="/logo.png" alt="Traveloop" className="h-14 w-14 object-contain transition-transform group-hover:scale-105" />
             <div className="flex items-baseline gap-0.5">
-              <span className="text-(--app-color-text) text-lg font-black uppercase tracking-tight">Trave</span>
-              <span className="text-lg font-black uppercase tracking-tight text-(--app-color-accent)">Loop</span>
+              <span className="text-(--app-color-text) text-xl font-black uppercase tracking-tighter">Trave</span>
+              <span className="text-xl font-black uppercase tracking-tighter text-(--app-color-accent)">Loop</span>
             </div>
           </Link>
         )}

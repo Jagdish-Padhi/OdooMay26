@@ -111,10 +111,10 @@ export default function MyTripsPage() {
                   {/* Hero Button */}
                   <button 
                     onClick={() => navigate(`/trips/${trip.id}/builder`)}
-                    className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-(--app-color-primary) to-[#4a2d44] p-4 text-white shadow-[0_8px_20px_rgba(107,33,168,0.2)] transition-all hover:shadow-[0_12px_25px_rgba(107,33,168,0.3)] hover:scale-[1.02] active:scale-95"
+                    className="group relative w-full overflow-hidden rounded-xl bg-linear-to-r from-(--app-color-primary) to-[#4a2d44] p-4 !text-white shadow-[0_8px_20px_rgba(107,33,168,0.2)] transition-all hover:shadow-[0_12px_25px_rgba(107,33,168,0.3)] hover:scale-[1.02] active:scale-95"
                   >
                     <div className="relative flex items-center justify-center gap-2">
-                      <Route size={16} className="transition-transform group-hover:rotate-12" />
+                      <Route size={16} className="transition-transform group-hover:rotate-12 !text-white" />
                       <span className="text-[11px] font-black uppercase tracking-[0.2em]">Manage Itinerary</span>
                     </div>
                   </button>

@@ -53,7 +53,7 @@ export default function LandingPage() {
           <Link to="/login" className="rounded-xl px-4 py-2 text-sm font-semibold text-(--app-color-text) hover:bg-white/60 transition-colors">
             Sign In
           </Link>
-          <Link to="/register" className="rounded-xl bg-(--app-color-primary) px-5 py-2 text-sm font-bold text-white shadow-md hover:bg-(--app-color-primary-hover) transition-colors">
+          <Link to="/register" className="rounded-xl bg-(--app-color-primary) px-5 py-2 text-sm font-bold !text-white shadow-md hover:bg-(--app-color-primary-hover) transition-colors">
             Get Started
           </Link>
         </div>
@@ -80,9 +80,9 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Link to="/register" className="flex items-center justify-center gap-2 rounded-2xl bg-(--app-color-primary) px-8 py-4 text-base font-bold text-white shadow-xl hover:bg-(--app-color-primary-hover) transition-all hover:scale-105">
+              <Link to="/register" className="flex items-center justify-center gap-2 rounded-2xl bg-(--app-color-primary) px-8 py-4 text-base font-black !text-white shadow-xl hover:bg-(--app-color-primary-hover) transition-all hover:scale-105">
                 Start Planning Now
-                <ArrowRight size={20} />
+                <ArrowRight size={20} className="!text-white" />
               </Link>
               <Link to="/login" className="flex items-center justify-center rounded-2xl border border-(--app-color-border) bg-white/70 px-8 py-4 text-base font-semibold text-(--app-color-text) backdrop-blur hover:bg-white transition-colors">
                 Sign In
