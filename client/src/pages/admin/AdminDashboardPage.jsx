@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { 
   Users, 
   Map, 
@@ -8,16 +8,29 @@ import {
   Search,
   MoreVertical,
   Activity,
-  Globe
+  Globe,
+  MapPinned,
+  CheckCircle2,
+  Star,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-import PageHeader from '../../components/PageHeader';
-import Card from '../../components/Card';
+import PageHeader from '../../components/PageHeader.jsx';
+import Card from '../../components/Card.jsx';
 import api from '../../services/api.js';
+
+function formatDate(value) {
+  return new Date(value).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userSearch, setUserSearch] = useState('');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -25,7 +38,7 @@ export default function AdminDashboardPage() {
         const res = await api.get('/admin/stats');
         setStats(res.data.data);
       } catch (err) {
-        console.error('Failed to fetch admin stats');
+        toast.error('Failed to fetch admin stats');
       } finally {
         setLoading(false);
       }
@@ -33,7 +46,21 @@ export default function AdminDashboardPage() {
     fetchStats();
   }, []);
 
-  if (loading) return null;
+  const filteredUsers = useMemo(() => {
+    const query = userSearch.trim().toLowerCase();
+    if (!query) return stats?.recentUsers || [];
+    return (stats?.recentUsers || []).filter((user) =>
+      [user.name, user.email, user.plan].some((value) => String(value || '').toLowerCase().includes(query)),
+    );
+  }, [stats?.recentUsers, userSearch]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-(--app-color-primary) border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 pb-12">
@@ -43,7 +70,7 @@ export default function AdminDashboardPage() {
       />
 
       {/* Top Stats */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {stats?.summary.map((stat, idx) => (
           <Card key={idx} className="p-8 group hover:border-(--app-color-primary) transition-all">
             <div className="flex items-start justify-between">
@@ -67,7 +94,7 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">
-        {/* User Growth Chart Placeholder */}
+        {/* User Growth Chart */}
         <Card className="p-8">
           <div className="mb-8 flex items-center justify-between">
             <h3 className="text-lg font-bold">Explorer Onboarding</h3>
@@ -104,7 +131,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-bold">{city.name}</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{city.count} Recent Trips</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{city.country} · {city.count} trips</p>
                 </div>
                 <div className="h-2 w-16 rounded-full bg-slate-100 overflow-hidden">
                   <div 
@@ -118,58 +145,55 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      {/* User Management Table Shell */}
-      <Card className="overflow-hidden border-none shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-100 p-8 bg-white">
-          <h3 className="text-lg font-bold">Recent Signups</h3>
-          <div className="relative">
+      <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
+        <Card className="p-8">
+          <h3 className="mb-6 text-lg font-bold">Popular Activities</h3>
+          <div className="space-y-4">
+            {stats?.popularActivities?.map((activity, idx) => (
+              <div key={`${activity.name}-${idx}`} className="flex items-center gap-4 rounded-2xl border border-(--app-color-border) px-4 py-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-(--app-color-primary-soft) text-(--app-color-primary)">
+                  <Star size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="truncate text-sm font-bold text-(--app-color-text)">{activity.name}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{activity.type} · {activity.count} saves</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="p-8">
+          <h3 className="mb-6 text-lg font-bold">Recent Signups</h3>
+          <div className="mb-4 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-            <input 
-              type="text" 
+            <input
+              type="text"
+              value={userSearch}
+              onChange={(event) => setUserSearch(event.target.value)}
               placeholder="Filter users..."
-              className="h-10 rounded-xl border border-slate-200 pl-10 pr-4 text-xs font-medium focus:border-(--app-color-primary) focus:ring-4 focus:ring-(--app-color-primary-soft)"
+              className="h-10 w-full rounded-xl border border-slate-200 pl-10 pr-4 text-xs font-medium focus:border-(--app-color-primary) focus:ring-4 focus:ring-(--app-color-primary-soft)"
             />
           </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                <th className="px-8 py-4">Explorer</th>
-                <th className="px-8 py-4">Status</th>
-                <th className="px-8 py-4">Joined</th>
-                <th className="px-8 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50 bg-white">
-              {[1, 2, 3, 4, 5].map(i => (
-                <tr key={i} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-8 py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-slate-200" />
-                      <div>
-                        <p className="text-sm font-bold text-(--app-color-text)">Explorer #{i}</p>
-                        <p className="text-xs text-(--app-color-text-muted)">explorer{i}@example.com</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-5">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
-                      <Activity size={10} /> Active
-                    </span>
-                  </td>
-                  <td className="px-8 py-5 text-sm text-slate-500 font-medium">May {10-i}, 2026</td>
-                  <td className="px-8 py-5 text-right">
-                    <button className="text-slate-300 hover:text-slate-600 transition-colors">
-                      <MoreVertical size={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+          <div className="space-y-3">
+            {filteredUsers.map((user) => (
+              <div key={user.id} className="flex items-center justify-between rounded-2xl border border-(--app-color-border) px-4 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold text-(--app-color-text)">{user.name}</p>
+                  <p className="truncate text-xs text-(--app-color-text-muted)">{user.email}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${user.plan === 'pro' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+                    {user.plan}
+                  </span>
+                  <span className="text-xs text-slate-400">{formatDate(user.createdAt)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
     </div>
   );
 }
