@@ -136,7 +136,7 @@ export default function LoginPage() {
                   error={errors.email}
                   required 
                   placeholder="you@example.com" 
-                  className="h-11 rounded-xl" 
+                  inputClassName="h-11 rounded-xl" 
                 />
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
@@ -151,7 +151,7 @@ export default function LoginPage() {
                     error={errors.password}
                     required 
                     placeholder="••••••••" 
-                    className="h-11 rounded-xl" 
+                    inputClassName="h-11 rounded-xl" 
                   />
                 </div>
                 <div className="pt-1">
