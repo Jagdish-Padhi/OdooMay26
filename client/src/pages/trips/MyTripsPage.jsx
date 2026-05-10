@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CalendarDays, Compass, MapPin, PencilLine, Plus, Trash2 } from 'lucide-react';
+import { CalendarDays, Compass, MapPin, PencilLine, Route, Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import Button from '../../components/Button.jsx';
@@ -82,7 +82,7 @@ export default function MyTripsPage() {
           {trips.map((trip) => (
             <Card key={trip.id} className="overflow-hidden p-0">
               <div
-                className="h-40 bg-gradient-to-br from-(--app-color-primary) via-[#8c5c84] to-(--app-color-accent)"
+                className="h-40 bg-linear-to-br from-(--app-color-primary) via-[#8c5c84] to-(--app-color-accent)"
                 style={trip.coverPhoto ? { backgroundImage: `linear-gradient(rgba(18,18,18,0.35), rgba(18,18,18,0.55)), url(${trip.coverPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
               >
                 <div className="flex h-full items-start justify-between p-4 text-white">
@@ -115,6 +115,10 @@ export default function MyTripsPage() {
                   <Button variant="secondary" size="sm" className="flex-1" onClick={() => navigate(`/trips/new?tripId=${trip.id}`)}>
                     <PencilLine size={15} />
                     Edit
+                  </Button>
+                  <Button size="sm" className="flex-1" onClick={() => navigate(`/trips/${trip.id}/builder`)}>
+                    <Route size={15} />
+                    Plan
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => handleDelete(trip)} className="text-red-600 hover:bg-red-50">
                     <Trash2 size={15} />
