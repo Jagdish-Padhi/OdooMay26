@@ -1,103 +1,93 @@
-# PERN Full-Stack Template
+# 🌍 TraveLoop - AI-Powered Travel Management Platform
 
-**PostgreSQL · Express · React · Node.js + Drizzle ORM**
+**Transforming scattered travel ideas into perfectly looped adventures.**
 
-Production-grade hackathon-ready template. Zero Firebase, zero Supabase — pure PostgreSQL with a dual-driver setup for local Docker and Neon cloud deployment.
-
----
-
-## Stack
-
-| Layer    | Tech                                   |
-|----------|----------------------------------------|
-| Frontend | React 19, Vite, TailwindCSS v4, Zustand |
-| Backend  | Express 5, Node.js ESM                |
-| ORM      | Drizzle ORM                           |
-| Database | PostgreSQL (Docker locally / Neon cloud) |
-| Auth     | JWT (access + refresh token rotation) |
+> TraveLoop is a high-performance, full-stack travel orchestration platform that bridges the gap between AI-driven discovery and granular itinerary execution. From magic AI generation to interactive map-based route building, it's the only loop you need for your next journey.
 
 ---
 
-## Quick Start
+## 🔗 Project Showcase
 
-### 1. Start local Postgres
-```bash
-docker compose up -d
-```
-
-### 2. Server
-```bash
-cd server
-cp .env.example .env    # fill in JWT_SECRET at minimum
-npm install
-npm run db:push          # apply schema to local DB
-npm run dev
-```
-
-### 3. Client
-```bash
-cd client
-cp .env.example .env    # or leave defaults for local
-npm install
-npm run dev
-```
-
-App: http://localhost:5173  
-API: http://localhost:5000/api
+| 🚀 Live Platform | 🎥 Video Walkthrough | 🎨 UI Mockups |
+|:------------:|:-------------------:|:---------------:|
+| [**Launch App**](https://traveloop.app) | [**Watch Demo**](https://youtu.be/traveloop-demo) | [**View Gallery**](#-ui-showcase) |
 
 ---
 
-## Customize for your PS
+## 🎯 Problem Statement
+Modern travelers face "Planning Fatigue" due to fragmented tools. Notes are in one app, budgets in a spreadsheet, and routes on a separate map. This fragmentation leads to inefficient routes, blown budgets, and missed discoveries.
 
-### Rename the user entity
-`users.name` in `server/src/db/schema/users.js` — rename to `orgName`, `teamName`, `fullName`, etc.  
-Update the label in `RegisterPage.jsx` to match.
-
-### Add domain tables
-1. Copy `server/src/db/schema/resourceItems.js` → rename file + table
-2. Export it in `db/schema/index.js`
-3. Run `npm run db:push`
-4. Copy service + controller + route files and rename
-
-### Add dashboard pages
-1. Create `client/src/pages/dashboard/YourPage.jsx` (copy `DashboardHomePage`)
-2. Add a nav item in `DashboardLayout.jsx`
-3. Add a `<Route>` in `AppRoutes.jsx`
-
-### Find all placeholders
-```bash
-grep -r "TODO" server/src/ client/src/ --include="*.js" --include="*.jsx" -n
-```
+## 💡 The Solution: The "Loop" Workflow
+TraveLoop provides a unified, continuous workflow:
+1. **Discover:** Search global cities with live cost and popularity indices.
+2. **AI Plan:** Generate high-fidelity itineraries in seconds using Google Gemini.
+3. **Build:** Fine-tune routes with a drag-and-drop Leaflet map interface.
+4. **Execute:** Manage budgets, packing lists, and trip journals in real-time.
 
 ---
 
-## Auth API
+## 🖼️ UI Showcase
 
-| Method | Endpoint        | Auth?  | Body                          |
-|--------|-----------------|--------|-------------------------------|
-| POST   | /auth/register  | No     | `{ name, email, password }`   |
-| POST   | /auth/login     | No     | `{ email, password }`         |
-| POST   | /auth/refresh   | Cookie | —                             |
-| POST   | /auth/logout    | Cookie | —                             |
-| GET    | /auth/me        | Bearer | —                             |
+| Dashboard Overview | AI Itinerary Generation | Interactive Map Builder |
+|:---:|:---:|:---:|
+| ![Dashboard](https://placehold.co/600x400/0f172a/white?text=Dashboard+Overview) | ![AI Planner](https://placehold.co/600x400/7c3aed/white?text=AI+Itinerary+Magic) | ![Map Builder](https://placehold.co/600x400/0d9488/white?text=Interactive+Route+Map) |
 
----
-
-## Deploy to Neon (Production DB)
-
-1. Create a free project at https://neon.tech
-2. Copy the connection string (contains `neon.tech`)
-3. Set it as `DATABASE_URL` in `server/.env`
-4. Run `npm run db:push` — Drizzle applies schema to Neon automatically
-5. The app auto-detects Neon and switches to the serverless HTTP driver
+| Budget Analytics | Trip Journal | Professional Reports |
+|:---:|:---:|:---:|
+| ![Budget](https://placehold.co/600x400/db2777/white?text=Real-time+Budgeting) | ![Notes](https://placehold.co/600x400/4f46e5/white?text=Trip+Journaling) | ![Reports](https://placehold.co/600x400/020617/white?text=Exportable+PDF+Gallery) |
 
 ---
 
-## Drizzle Cheatsheet
+## 🚀 Key Features
 
-```bash
-npm run db:push      # push schema changes to DB (no migration files)
-npm run db:generate  # generate SQL migration files
-npm run db:migrate   # run pending migrations
-npm run db:studio    # open Drizzle Studio (visual DB browser)
-```
+### ✅ AI Intelligence (Phase 6)
+- **Gemini-Powered Planning:** Generate structured itineraries based on budget, duration, and preferences.
+- **Smart Suggestions:** Real-time activity ideas with cost and duration estimates.
+
+### ✅ Itinerary Builder (Phase 3)
+- **Interactive Maps:** Live Leaflet map integration with auto-geocoding.
+- **Drag-and-Drop:** Reorder stops and activities with a visual timeline.
+- **Detailed Tracking:** Precise arrival/departure timing and per-activity cost logging.
+
+### ✅ Utility Suite (Phase 4 & 5)
+- **Smart Budgeting:** Dynamic cost breakdowns per city cost index.
+- **Packing Engine:** Smart checklists for gear and essentials.
+- **Trip Journal:** Rich text notes to capture travel moments.
+- **Report Gallery:** Background-generated, industry-grade PDF summaries.
+
+### ✅ Social & Public Hub
+- **Public Itineraries:** Share your plans via unique public URLs.
+- **One-Click Duplication:** Clone public trips to your own dashboard for customization.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | React 19, Vite, TailwindCSS v4, Zustand |
+| **Backend** | Node.js, Express 5, Drizzle ORM |
+| **Database** | PostgreSQL (Docker / Neon Serverless) |
+| **AI Engine** | Google Gemini Pro |
+| **Maps** | Leaflet.js / OpenStreetMap |
+
+---
+
+## 👥 Team TraveLoop
+
+| Member | Role |
+|--------|------|
+| [**Jagdish Padhi**](https://github.com/Jagdish-Padhi) | Lead Full-Stack Architect & AI Integration |
+| [**Saman Pandey**](https://github.com/SamanPandey-in) | Full Stack Architect, DB Designer & Integrator |
+
+
+---
+
+## 🔮 Future Scope
+- **Real-time Collaboration:** Live multi-user editing of the same itinerary.
+- **Offline Mode:** PWA support for accessing plans without roaming data.
+- **Flight Integration:** Live flight price tracking and booking integration.
+
+---
+
+**Built with ❤️ for Global Travelers by Team Esc(Reality);**
