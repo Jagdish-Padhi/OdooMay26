@@ -14,6 +14,7 @@ import { Check } from 'lucide-react';
 import Button from '../../components/Button';
 import Container from '../../components/Container';
 import Input from '../../components/Input';
+import { useFormErrors } from '../../hooks/useFormErrors.js';
 import api from '../../services/api.js';
 import useAuthStore from '../../store/auth.store.js';
 
@@ -34,10 +35,22 @@ export default function LoginPage() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const setTransitioning = useAuthStore((s) => s.setTransitioning);
 
+  const { errors, validate, clearError } = useFormErrors({
+    email: (v) => {
+      if (!v.trim()) return 'Email is required.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Enter a valid email address.';
+    },
+    password: (v) => {
+      if (!v) return 'Password is required.';
+      if (v.length < 6) return 'Password must be at least 6 characters.';
+    },
+  });
+
   const handleChange = (e) => setFormData((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate(formData)) return;
     setIsSubmitting(true);
     setTransitioning(true, true);
     try {
@@ -114,13 +127,32 @@ export default function LoginPage() {
               </div>
               <form className="space-y-4" onSubmit={handleSubmit}>
                 {/* TODO: Adjust label/placeholder to match your entity (e.g. "Work Email") */}
-                <Input label="Email" type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="you@example.com" className="h-11 rounded-xl" />
+                <Input 
+                  label="Email" 
+                  type="email" 
+                  name="email" 
+                  value={formData.email} 
+                  onChange={(e) => { handleChange(e); clearError('email'); }} 
+                  error={errors.email}
+                  required 
+                  placeholder="you@example.com" 
+                  className="h-11 rounded-xl" 
+                />
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-semibold text-(--app-color-text)">Password</label>
                     <Link to="/forgot-password" className="text-xs font-medium text-(--app-color-primary) hover:underline">Forgot password?</Link>
                   </div>
-                  <Input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="••••••••" className="h-11 rounded-xl" />
+                  <Input 
+                    type="password" 
+                    name="password" 
+                    value={formData.password} 
+                    onChange={(e) => { handleChange(e); clearError('password'); }} 
+                    error={errors.password}
+                    required 
+                    placeholder="••••••••" 
+                    className="h-11 rounded-xl" 
+                  />
                 </div>
                 <div className="pt-1">
                   {/* TODO: Replace button label */}

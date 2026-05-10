@@ -14,6 +14,7 @@ import toast from 'react-hot-toast';
 import Button from '../../components/Button';
 import Container from '../../components/Container';
 import Input from '../../components/Input';
+import { useFormErrors } from '../../hooks/useFormErrors.js';
 import api from '../../services/api.js';
 import useAuthStore from '../../store/auth.store.js';
 
@@ -33,14 +34,32 @@ export default function RegisterPage() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const setTransitioning = useAuthStore((s) => s.setTransitioning);
 
+  const { errors, validate, clearError } = useFormErrors({
+    name: (v) => {
+      if (!v.trim()) return 'Full name is required.';
+      if (v.trim().length < 2) return 'Name must be at least 2 characters.';
+    },
+    email: (v) => {
+      if (!v.trim()) return 'Email is required.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Enter a valid email address.';
+    },
+    password: (v) => {
+      if (!v) return 'Password is required.';
+      if (v.length < 8) return 'Password must be at least 8 characters.';
+      if (!/[A-Z]/.test(v)) return 'Include at least one uppercase letter.';
+      if (!/[0-9]/.test(v)) return 'Include at least one number.';
+    },
+    confirmPassword: (v, all) => {
+      if (!v) return 'Please confirm your password.';
+      if (v !== all.password) return 'Passwords do not match.';
+    },
+  });
+
   const handleChange = (e) => setFormData((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match.');
-      return;
-    }
+    if (!validate(formData)) return;
     setIsSubmitting(true);
     setTransitioning(true, true);
     try {
@@ -116,11 +135,50 @@ export default function RegisterPage() {
               </div>
               <form className="space-y-3" onSubmit={handleSubmit}>
                 {/* TODO: Rename label to match your entity (e.g. "Organization Name", "Full Name") */}
-                <Input label="Your Name" name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Acme Corp" className="h-10 rounded-xl text-sm" />
-                <Input label="Email" type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="you@example.com" className="h-10 rounded-xl text-sm" />
+                <Input 
+                  label="Your Name" 
+                  name="name" 
+                  value={formData.name} 
+                  onChange={(e) => { handleChange(e); clearError('name'); }} 
+                  error={errors.name}
+                  required 
+                  placeholder="e.g. Acme Corp" 
+                  className="h-10 rounded-xl text-sm" 
+                />
+                <Input 
+                  label="Email" 
+                  type="email" 
+                  name="email" 
+                  value={formData.email} 
+                  onChange={(e) => { handleChange(e); clearError('email'); }} 
+                  error={errors.email}
+                  required 
+                  placeholder="you@example.com" 
+                  className="h-10 rounded-xl text-sm" 
+                />
                 <div className="grid grid-cols-2 gap-3">
-                  <Input label="Password" type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="••••••••" className="h-10 rounded-xl text-sm" />
-                  <Input label="Confirm" type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required placeholder="••••••••" className="h-10 rounded-xl text-sm" />
+                  <Input 
+                    label="Password" 
+                    type="password" 
+                    name="password" 
+                    value={formData.password} 
+                    onChange={(e) => { handleChange(e); clearError('password'); }} 
+                    error={errors.password}
+                    required 
+                    placeholder="••••••••" 
+                    className="h-10 rounded-xl text-sm" 
+                  />
+                  <Input 
+                    label="Confirm" 
+                    type="password" 
+                    name="confirmPassword" 
+                    value={formData.confirmPassword} 
+                    onChange={(e) => { handleChange(e); clearError('confirmPassword'); }} 
+                    error={errors.confirmPassword}
+                    required 
+                    placeholder="••••••••" 
+                    className="h-10 rounded-xl text-sm" 
+                  />
                 </div>
                 <div className="pt-1">
                   {/* TODO: Replace button label */}
