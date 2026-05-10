@@ -7,6 +7,7 @@ import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
 import Input from '../../components/Input.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
+import { FormSkeleton } from '../../components/skeletons/FormSkeleton.jsx';
 import useTripsStore from '../../store/trips.store.js';
 
 function TripForm({ trip, destination, saving, onSubmit }) {
@@ -142,8 +143,8 @@ export default function CreateTripPage() {
 
   if (tripId && loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-(--app-color-primary) border-t-transparent" />
+      <div className="mx-auto max-w-4xl space-y-8 pb-12">
+        <FormSkeleton />
       </div>
     );
   }

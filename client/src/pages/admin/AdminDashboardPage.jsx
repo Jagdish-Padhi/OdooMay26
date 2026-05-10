@@ -18,6 +18,7 @@ import toast from 'react-hot-toast';
 import PageHeader from '../../components/PageHeader.jsx';
 import Card from '../../components/Card.jsx';
 import api from '../../services/api.js';
+import { AdminSkeleton } from '../../components/skeletons/AdminSkeleton.jsx';
 
 function formatDate(value) {
   return new Date(value).toLocaleDateString('en-US', {
@@ -56,8 +57,8 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-(--app-color-primary) border-t-transparent" />
+      <div className="mx-auto max-w-7xl space-y-8 pb-12">
+        <AdminSkeleton />
       </div>
     );
   }

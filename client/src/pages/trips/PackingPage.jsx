@@ -8,6 +8,7 @@ import Card from '../../components/Card.jsx';
 import Input from '../../components/Input.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
 import ProgressBar from '../../components/ProgressBar.jsx';
+import { FormSkeleton } from '../../components/skeletons/FormSkeleton.jsx';
 import { checklistService } from '../../services/checklist.service.js';
 import { tripsService } from '../../services/trips.service.js';
 
@@ -135,8 +136,8 @@ export default function PackingPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-(--app-color-primary) border-t-transparent" />
+      <div className="mx-auto max-w-3xl space-y-6 pb-12">
+        <FormSkeleton />
       </div>
     );
   }
