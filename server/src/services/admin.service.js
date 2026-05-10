@@ -62,14 +62,14 @@ export async function getPlatformStats() {
 
   return {
     summary: [
-      { label: 'Total Explorers', value: userCount.value, change: '+12%', trend: 'up' },
-      { label: 'Active Itineraries', value: tripCount.value, change: '+18%', trend: 'up' },
-      { label: 'Global Destinations', value: popularCities.length, change: '+5%', trend: 'up' },
-      { label: 'Tracked Activities', value: activityCount.value, change: '+9%', trend: 'up' },
+      { label: 'Total Explorers', value: Number(userCount.value || 0), change: '+12%', trend: 'up' },
+      { label: 'Active Itineraries', value: Number(tripCount.value || 0), change: '+18%', trend: 'up' },
+      { label: 'Global Destinations', value: Number(popularCities.length || 0), change: '+5%', trend: 'up' },
+      { label: 'Tracked Activities', value: Number(activityCount.value || 0), change: '+9%', trend: 'up' },
     ],
     popularCities,
     popularActivities,
     recentUsers,
-    userGrowth: growth.rows || []
+    userGrowth: growth.rows ?? growth ?? [],
   };
 }
