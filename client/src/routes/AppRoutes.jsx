@@ -10,6 +10,9 @@ import RegisterPage from '../pages/auth/RegisterPage.jsx';
 import DashboardHomePage from '../pages/dashboard/DashboardHomePage.jsx';
 import ProfilePage from '../pages/dashboard/ProfilePage.jsx';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage.jsx';
+import MyTripsPage from '../pages/trips/MyTripsPage.jsx';
+import CreateTripPage from '../pages/trips/CreateTripPage.jsx';
+import CitySearchPage from '../pages/search/CitySearchPage.jsx';
 import PackingPage from '../pages/trips/PackingPage.jsx';
 import NotesPage from '../pages/trips/NotesPage.jsx';
 import BudgetPage from '../pages/trips/BudgetPage.jsx';
@@ -61,6 +64,9 @@ export default function AppRoutes() {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardHomePage />} />
             <Route path="/dashboard/profile" element={<ProfilePage />} />
+            <Route path="/trips" element={<MyTripsPage />} />
+            <Route path="/trips/new" element={<CreateTripPage />} />
+            <Route path="/discover" element={<CitySearchPage />} />
             <Route path="/dashboard/packing" element={<PackingPage />} />
             <Route path="/dashboard/notes" element={<NotesPage />} />
             <Route path="/dashboard/budget" element={<BudgetPage />} />
