@@ -1,28 +1,32 @@
 :root {
 	--app-font-sans: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 	--app-font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-	--app-rgb-primary: 15, 95, 115;
-	--app-rgb-accent: 23, 92, 211;
-	--app-color-bg: #f2f5f9;
+	--app-rgb-primary: 113, 75, 103; /* #714B67 - Odoo Purple */
+	--app-rgb-accent: 2, 132, 199;   /* #0284C7 - Sky 700 */
+	--app-color-bg: #f8fafc;
 	--app-color-surface: #ffffff;
-	--app-color-surface-elevated: #e8eef4;
-	--app-color-surface-glass: rgba(255, 255, 255, 0.82);
-	--app-color-surface-panel: rgba(255, 255, 255, 0.94);
-	--app-color-text: #0b1422;
-	--app-color-text-muted: #516075;
-	--app-color-border: #c3d0de;
-	--app-color-primary: #0f5f73;
-	--app-color-primary-hover: #0b4a5a;
-	--app-color-primary-soft: #d8ecf2;
-	--app-color-accent: #175cd3;
-	--app-color-canvas-glow: #d8e2ee;
-	--app-color-success: #15803d;
-	--app-color-warning: #b45309;
-	--app-color-danger: #b42318;
-	--app-gradient-shell: radial-gradient(circle at top left, rgba(var(--app-rgb-accent), 0.14), transparent 30%), radial-gradient(circle at bottom right, rgba(var(--app-rgb-primary), 0.12), transparent 24%), linear-gradient(180deg, #f2f5f9 0%, #e8eef4 100%);
-	--app-gradient-auth-login: linear-gradient(160deg, #0c1624 0%, #112638 58%, #11485c 100%);
-	--app-gradient-auth-register: linear-gradient(150deg, #093735 0%, #0f5f73 55%, #175cd3 100%);
-	--app-shadow-elevated: 0 24px 40px rgba(11, 20, 34, 0.12);
+	--app-color-surface-elevated: #f1f5f9;
+	--app-color-surface-glass: rgba(255, 255, 255, 0.72);
+	--app-color-surface-panel: rgba(255, 255, 255, 0.92);
+	--app-color-text: #0f172a;
+	--app-color-text-muted: #475569;
+	--app-color-border: #e2e8f0;
+	--app-color-primary: #714b67;
+	--app-color-primary-hover: #5a3c52;
+	--app-color-primary-soft: #f1e6ef;
+	--app-color-accent: #0284c7;
+	--app-color-canvas-glow: #f0f9ff;
+	--app-color-success: #059669;
+	--app-color-warning: #d97706;
+	--app-color-danger: #dc2626;
+	--app-gradient-shell: radial-gradient(circle at 0% 0%, rgba(2, 132, 199, 0.08) 0%, transparent 40%), radial-gradient(circle at 100% 100%, rgba(113, 75, 103, 0.06) 0%, transparent 40%), #f8fafc;
+	--app-gradient-auth-login: linear-gradient(135deg, #2d1a2d 0%, #4a274a 50%, #714b67 100%);
+	--app-gradient-auth-register: linear-gradient(135deg, #0284c7 0%, #714b67 100%);
+	--app-shadow-elevated: 0 20px 50px -12px rgba(15, 23, 42, 0.12);
+
+
+
+
 }
 
 @theme{

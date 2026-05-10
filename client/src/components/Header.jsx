@@ -23,18 +23,18 @@ const Header = ({
 			className='flex items-center gap-3 logo-brand group'
 			onClick={onLogoClick}
 		>
-			<img src='/navlogo.png' alt='Your App' className='h-12 w-12 object-contain transition-transform duration-500 group-hover:scale-110' />
+			<img src='/logo.png' alt='TravLoop' className='h-12 w-12 object-contain transition-transform group-hover:scale-110' />
 			<div className="flex items-baseline gap-0.5">
-				<span className="text-(--app-color-text) text-2xl!">Sport</span>
-				<span className="logo-shield text-2xl!">Shield</span>
+				<span className="text-(--app-color-text) text-xl font-black uppercase tracking-tight">Trave</span>
+				<span className="logo-shield text-xl font-black uppercase tracking-tight text-(--app-color-accent)">Loop</span>
 			</div>
 		</button>
 	) : (
 		<Link to={logoHref} className='flex items-center gap-3 logo-brand group'>
-			<img src='/navlogo.png' alt='Your App' className='h-12 w-12 object-contain transition-transform duration-500 group-hover:scale-110' />
+			<img src='/logo.png' alt='TravLoop' className='h-12 w-12 object-contain transition-transform group-hover:scale-110' />
 			<div className="flex items-baseline gap-0.5">
-				<span className="text-(--app-color-text) text-2xl!">Sport</span>
-				<span className="logo-shield text-2xl!">Shield</span>
+				<span className="text-(--app-color-text) text-xl font-black uppercase tracking-tight">Trave</span>
+				<span className="logo-shield text-xl font-black uppercase tracking-tight text-(--app-color-accent)">Loop</span>
 			</div>
 		</Link>
 	);
@@ -60,7 +60,7 @@ const Header = ({
 								href={item.href}
 								className='nav-link-underline flex items-center gap-2 text-sm font-medium'
 							>
-								{Icon && <Icon size={16} className="text-(--app-color-success)/70" />}
+								{Icon && <Icon size={16} className="text-(--app-color-accent)/70" />}
 								{item.label}
 							</a>
 						);

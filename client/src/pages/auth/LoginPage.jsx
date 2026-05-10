@@ -9,6 +9,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { Check } from 'lucide-react';
 
 import Button from '../../components/Button';
 import Container from '../../components/Container';
@@ -20,10 +21,10 @@ const initialForm = { email: '', password: '' };
 
 // TODO: Replace these with your app's real feature highlights
 const FEATURE_BULLETS = [
-  'Feature one — describe your core value',
-  'Feature two — describe a key capability',
-  'Feature three — describe a differentiator',
-  'Feature four — describe another benefit',
+  'Multi-city Itineraries',
+  'Real-time Budgeting',
+  'Interactive Timelines',
+  'Shared Travel Plans',
 ];
 
 export default function LoginPage() {
@@ -68,28 +69,26 @@ export default function LoginPage() {
             <div className="relative z-10 flex flex-col items-center">
               <div className="flex flex-col items-center gap-6">
                 {/* TODO: Replace /logo.png with your logo */}
-                <img src="/logo.png" alt="App Logo" className="h-36 w-36 object-contain drop-shadow-2xl" />
-                <div className="h-[3px] w-16 rounded-full bg-emerald-400" />
+                <img src="/logo.png" alt="TravLoop Logo" className="h-48 w-48 object-contain drop-shadow-2xl" />
+                <div className="h-[3px] w-16 rounded-full bg-teal-500" />
               </div>
               <div className="mt-8">
                 {/* TODO: Replace with your app tagline */}
-                <h1 className="text-4xl font-black uppercase tracking-tighter italic lg:text-5xl">
-                  Your Tagline <br />
-                  <span className="text-teal-400">Goes Right Here.</span>
+                <h1 className="text-4xl font-black uppercase tracking-tighter italic lg:text-5xl text-white">
+                  Dream, Plan, <br />
+                  <span className="text-teal-500">Discover.</span>
                 </h1>
-                {/* TODO: Replace with your app's one-liner */}
                 <p className="mx-auto mt-4 max-w-sm text-lg font-bold leading-tight text-white/70">
-                  Your app's value proposition goes here — one punchy sentence.
+                  The only platform you need for personalized, collaborative travel itineraries.
                 </p>
               </div>
               <div className="mt-10 grid grid-cols-2 gap-x-8 gap-y-4 px-4 text-left">
                 {FEATURE_BULLETS.map((f) => (
                   <div key={f} className="flex items-center gap-2.5">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-500/20 text-teal-400">
+                      <Check size={12} strokeWidth={4} />
                     </div>
+
                     <span className="whitespace-nowrap text-xs font-black uppercase tracking-wider text-white/90">{f}</span>
                   </div>
                 ))}
@@ -97,8 +96,8 @@ export default function LoginPage() {
             </div>
             <div className="absolute bottom-6 left-0 right-0 z-10 flex items-center justify-between px-10 text-[9px] font-black uppercase tracking-[0.3em] text-white/25">
               {/* TODO: Replace with your app name and year */}
-              <p>© 2026 Your App Name</p>
-              <p>Subtitle here</p>
+              <p>© 2026 Traveloop</p>
+              <p>Personalized Travel Planning</p>
             </div>
           </section>
 

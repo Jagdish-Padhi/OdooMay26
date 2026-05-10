@@ -21,9 +21,9 @@ const initialForm = { name: '', email: '', password: '', confirmPassword: '' };
 
 // TODO: Replace with your app's real onboarding steps
 const ONBOARDING_STEPS = [
-  'Create your account and set up your profile.',
-  'Access your personalized dashboard.',
-  'Start using the core features of the app.',
+  'Create your account and set up your traveler profile.',
+  'Access your personalized travel dashboard.',
+  'Start planning your next multi-city journey.',
 ];
 
 export default function RegisterPage() {
@@ -72,23 +72,23 @@ export default function RegisterPage() {
             <div className="relative z-10 flex flex-col items-center">
               <div className="flex flex-col items-center gap-6">
                 {/* TODO: Replace /logo.png */}
-                <img src="/logo.png" alt="App Logo" className="h-36 w-36 object-contain drop-shadow-2xl" />
-                <div className="h-[3px] w-16 rounded-full bg-emerald-400" />
+                <img src="/logo.png" alt="TravLoop Logo" className="h-48 w-48 object-contain drop-shadow-2xl" />
+                <div className="h-[3px] w-16 rounded-full bg-teal-500" />
               </div>
               <div className="mt-8">
                 {/* TODO: Replace heading and description */}
-                <h1 className="text-4xl font-black uppercase tracking-tighter italic lg:text-5xl">
+                <h1 className="text-4xl font-black uppercase tracking-tighter italic lg:text-5xl text-white">
                   Get Started <br />
-                  <span className="text-teal-400">Today.</span>
+                  <span className="text-teal-500">Today.</span>
                 </h1>
                 <p className="mx-auto mt-4 max-w-sm text-lg font-bold leading-tight text-white/70">
-                  Your signup value proposition goes here.
+                  Join thousands of travelers planning their dream trips with Traveloop.
                 </p>
               </div>
               <div className="mt-10 space-y-4 px-4 text-left">
                 {ONBOARDING_STEPS.map((step, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/30 text-emerald-400 text-xs font-black">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-500/30 text-teal-500 text-xs font-black">
                       {i + 1}
                     </div>
                     <p className="text-sm text-white/80">{step}</p>
@@ -98,8 +98,8 @@ export default function RegisterPage() {
             </div>
             <div className="absolute bottom-6 left-0 right-0 z-10 flex items-center justify-between px-10 text-[9px] font-black uppercase tracking-[0.3em] text-white/25">
               {/* TODO: Replace app name */}
-              <p>© 2026 Your App Name</p>
-              <p>Subtitle here</p>
+              <p>© 2026 Traveloop</p>
+              <p>Personalized Travel Planning</p>
             </div>
           </section>
 

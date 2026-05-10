@@ -1,92 +1,102 @@
 import { Link } from 'react-router-dom';
-import { Mail, Terminal, Globe, Users, ExternalLink } from 'lucide-react';
-import Container from './Container';
+import { 
+  Twitter, 
+  Linkedin, 
+  Github, 
+  Instagram, 
+  Mail, 
+  MapPin, 
+  Phone 
+} from 'lucide-react';
 
-export default function Footer() {
-	return (
-		<footer className='border-t border-(--app-color-border) bg-(--app-color-surface) pt-20 pb-10'>
-			<Container>
-				<div className='grid gap-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr] pb-16'>
-					<div className='space-y-6'>
-						<Link to='/' className='flex items-center gap-3 logo-brand group'>
-							<img src='/navlogo.png' alt='Your App' className='h-10 w-10 object-contain transition-transform duration-500 group-hover:rotate-12' />
-							<div className="flex items-baseline gap-0.5">
-								<span className="text-(--app-color-text) text-xl!">Sport</span>
-								<span className="logo-shield text-xl!">Shield</span>
-							</div>
-						</Link>
-						<p className='max-w-xs text-sm leading-7 text-(--app-color-text-muted)'>
-							The next-generation command center for digital rights protection. Monitor, detect, and enforce your content integrity across the global web.
-						</p>
-						<div className='flex items-center gap-4'>
-							<a href='#' className='p-2 rounded-full border border-(--app-color-border) text-(--app-color-text-muted) hover:text-(--app-color-primary) hover:border-(--app-color-primary) transition-all'>
-								<Globe size={18} />
-							</a>
-							<a href='#' className='p-2 rounded-full border border-(--app-color-border) text-(--app-color-text-muted) hover:text-(--app-color-primary) hover:border-(--app-color-primary) transition-all'>
-								<Users size={18} />
-							</a>
-							<a href='#' className='p-2 rounded-full border border-(--app-color-border) text-(--app-color-text-muted) hover:text-(--app-color-primary) hover:border-(--app-color-primary) transition-all'>
-								<Terminal size={18} />
-							</a>
-						</div>
-					</div>
+const Footer = () => {
+  return (
+    <footer className="border-t border-(--app-color-border) bg-white pt-16 pb-8">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-4 lg:gap-8">
+          {/* Brand Section */}
+          <div className="col-span-1 lg:col-span-1">
+            <div className="flex items-center gap-3 logo-brand mb-6 group">
+              <img src="/logo.png" alt="TravLoop" className="h-12 w-12 object-contain transition-transform group-hover:scale-110" />
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-(--app-color-text) text-xl font-black uppercase tracking-tight">Trave</span>
+                <span className="logo-shield text-xl font-black uppercase tracking-tight text-(--app-color-accent)">Loop</span>
+              </div>
+            </div>
 
-					<div>
-						<h4 className='text-xs font-black uppercase tracking-[0.2em] text-(--app-color-text) mb-6'>Product</h4>
-						<ul className='space-y-4 text-sm text-(--app-color-text-muted)'>
-							<li><a href='#product' className='hover:text-(--app-color-primary) transition-colors'>Overview</a></li>
-							<li><a href='#capabilities' className='hover:text-(--app-color-primary) transition-colors'>Capabilities</a></li>
-							<li><a href='#workflow' className='hover:text-(--app-color-primary) transition-colors'>Workflow</a></li>
-							<li><Link to='/register' className='hover:text-(--app-color-primary) transition-colors'>Get Started</Link></li>
-						</ul>
-					</div>
+            <p className="text-sm leading-relaxed text-(--app-color-text-muted) mb-6 max-w-xs">
+              The world's first collaborative travel planner designed for modern explorers. 
+              Plan, budget, and discover with precision.
+            </p>
+            <div className="flex gap-4">
+              <a href="#" className="text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">
+                <Twitter size={20} />
+              </a>
+              <a href="#" className="text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">
+                <Linkedin size={20} />
+              </a>
+              <a href="#" className="text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">
+                <Github size={20} />
+              </a>
+              <a href="#" className="text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">
+                <Instagram size={20} />
+              </a>
+            </div>
+          </div>
 
-					<div>
-						<h4 className='text-xs font-black uppercase tracking-[0.2em] text-(--app-color-text) mb-6'>Contact & Support</h4>
-						<ul className='space-y-4 text-sm text-(--app-color-text-muted)'>
-							<li className='flex items-center gap-2'>
-								<Mail size={14} className='text-(--app-color-success)' />
-								<a href='mailto:code369decode@gmail.com' className='hover:text-(--app-color-primary) transition-colors'>code369decode@gmail.com</a>
-							</li>
-							<li className='flex items-center gap-2'>
-								<ExternalLink size={14} />
-								<a href='#' className='hover:text-(--app-color-primary) transition-colors'>Documentation</a>
-							</li>
-							<li className='flex items-center gap-2'>
-								<ExternalLink size={14} />
-								<a href='#' className='hover:text-(--app-color-primary) transition-colors'>API Status</a>
-							</li>
-						</ul>
-					</div>
+          {/* Links Sections */}
+          <div>
+            <h4 className="text-sm font-bold uppercase tracking-widest text-(--app-color-text) mb-6">Product</h4>
+            <ul className="space-y-4">
+              <li><Link to="/" className="text-sm text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">Itinerary Planner</Link></li>
+              <li><Link to="/" className="text-sm text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">Budget Tracker</Link></li>
+              <li><Link to="/" className="text-sm text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">Travel Communities</Link></li>
+              <li><Link to="/" className="text-sm text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">Mobile App</Link></li>
+            </ul>
+          </div>
 
-					<div>
-						<h4 className='text-xs font-black uppercase tracking-[0.2em] text-(--app-color-text) mb-6'>Organization</h4>
-						<ul className='space-y-4 text-sm text-(--app-color-text-muted)'>
-							<li><a href='#' className='hover:text-(--app-color-primary) transition-colors'>About Team</a></li>
-							<li><a href='#' className='hover:text-(--app-color-primary) transition-colors'>Terms of Service</a></li>
-							<li><a href='#' className='hover:text-(--app-color-primary) transition-colors'>Privacy Policy</a></li>
-							<li className='pt-2'>
-								<span className='inline-flex items-center rounded-lg bg-(--app-color-primary-soft) px-2.5 py-1 text-[10px] font-bold text-(--app-color-primary) uppercase tracking-wider'>
-									v1.0.0 Stable
-								</span>
-							</li>
-						</ul>
-					</div>
-				</div>
+          <div>
+            <h4 className="text-sm font-bold uppercase tracking-widest text-(--app-color-text) mb-6">Company</h4>
+            <ul className="space-y-4">
+              <li><a href="#" className="text-sm text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">About Us</a></li>
+              <li><a href="#" className="text-sm text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">Careers</a></li>
+              <li><a href="#" className="text-sm text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">Press Kit</a></li>
+              <li><a href="#" className="text-sm text-(--app-color-text-muted) hover:text-(--app-color-primary) transition-colors">Contact</a></li>
+            </ul>
+          </div>
 
-				<div className='pt-10 border-t border-(--app-color-border) flex flex-col md:flex-row items-center justify-between gap-6'>
-					<p className='text-xs text-(--app-color-text-muted) font-medium'>
-						© {new Date().getFullYear()} Your App. All rights reserved.
-					</p>
-					<p className='text-xs text-(--app-color-text-muted)'>
-						Built with precision by <span className='font-bold text-(--app-color-text)'>Team Esc(Reality);</span>
-					</p>
-					<div className='flex items-center gap-6 text-xs font-semibold text-(--app-color-text-muted) uppercase tracking-widest'>
-						<a href='#' className='hover:text-(--app-color-text) transition-colors'>Cookie Policy</a>
-						<a href='#' className='hover:text-(--app-color-text) transition-colors'>GDPR</a>
-					</div>
-				</div>
-			</Container>
-		</footer>
-	);
-}
+          <div>
+            <h4 className="text-sm font-bold uppercase tracking-widest text-(--app-color-text) mb-6">Support</h4>
+            <ul className="space-y-4">
+              <li className="flex items-center gap-3 text-sm text-(--app-color-text-muted)">
+                <Mail size={16} className="text-(--app-color-accent)" />
+                support@traveloop.com
+              </li>
+              <li className="flex items-center gap-3 text-sm text-(--app-color-text-muted)">
+                <Phone size={16} className="text-(--app-color-accent)" />
+                +1 (555) 000-0000
+              </li>
+              <li className="flex items-start gap-3 text-sm text-(--app-color-text-muted)">
+                <MapPin size={16} className="text-(--app-color-accent) mt-1" />
+                123 Explorer Way,<br />San Francisco, CA 94103
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-16 pt-8 border-t border-(--app-color-border)/50 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-(--app-color-text-muted)">
+            © 2026 Traveloop Inc. All rights reserved. Built for modern explorers.
+          </p>
+          <div className="flex gap-8">
+            <a href="#" className="text-xs text-(--app-color-text-muted) hover:text-(--app-color-text) transition-colors">Privacy Policy</a>
+            <a href="#" className="text-xs text-(--app-color-text-muted) hover:text-(--app-color-text) transition-colors">Terms of Service</a>
+            <a href="#" className="text-xs text-(--app-color-text-muted) hover:text-(--app-color-text) transition-colors">Cookie Settings</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;

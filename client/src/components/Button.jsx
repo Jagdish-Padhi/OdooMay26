@@ -21,7 +21,8 @@ const Button = ({
 
 	const variantStyles = {
 		primary:
-			'bg-[var(--app-color-primary)] text-white hover:bg-[var(--app-color-primary-hover)] active:scale-95',
+			'bg-gradient-to-r from-[var(--app-color-primary)] to-[#4a274a] text-white shadow-[0_4px_14px_0_rgba(113,75,103,0.39)] hover:shadow-[0_6px_20px_rgba(113,75,103,0.23)] hover:scale-[1.02] active:scale-[0.98] border border-white/10',
+
 		secondary: 'bg-[var(--app-color-surface-elevated)] text-[var(--app-color-text)] border border-[var(--app-color-border)] hover:bg-[var(--app-color-canvas-glow)]',
 		tertiary: 'text-[var(--app-color-primary)] hover:bg-[var(--app-color-primary-soft)]',
 		danger: 'bg-red-600 text-white hover:bg-red-700 active:scale-95',
