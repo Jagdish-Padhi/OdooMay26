@@ -87,7 +87,7 @@ export default function PackingListPage() {
               <span className="text-3xl font-black text-(--app-color-primary)">{Math.round(progress)}%</span>
               <span className="text-sm font-medium text-(--app-color-text-muted)">{packedCount}/{totalCount} Items</span>
             </div>
-            <ProgressBar progress={progress} className="h-3 rounded-full" />
+            <ProgressBar value={progress} className="h-3 rounded-full" />
           </Card>
 
           <Card className="p-6">

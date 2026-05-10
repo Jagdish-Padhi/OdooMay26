@@ -14,6 +14,7 @@ import {
 import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import ProgressBar from '../../components/ProgressBar';
+import Button from '../../components/Button';
 
 export default function BudgetPage() {
   const [budgetData, setBudgetData] = useState(null);
@@ -100,7 +101,7 @@ export default function BudgetPage() {
                         <span className="ml-2 text-xs text-(--app-color-text-muted)">({Math.round(percentage)}%)</span>
                       </div>
                     </div>
-                    <ProgressBar progress={percentage} className={`h-2 rounded-full ${item.color.replace('bg-', 'bg-opacity-20 ')}`} />
+                    <ProgressBar value={percentage} className={`h-2 rounded-full ${item.color.replace('bg-', 'bg-opacity-20 ')}`} />
                   </div>
                 );
               })}
