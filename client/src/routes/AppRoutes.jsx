@@ -13,6 +13,7 @@ import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage.jsx';
 import PackingPage from '../pages/trips/PackingPage.jsx';
 import NotesPage from '../pages/trips/NotesPage.jsx';
 import BudgetPage from '../pages/trips/BudgetPage.jsx';
+import SharedTripPage from '../pages/trips/SharedTripPage.jsx';
 
 import useAuthStore from '../store/auth.store.js';
 
@@ -53,6 +54,7 @@ export default function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/trips/public/:id" element={<SharedTripPage />} />
         <Route element={<PrivateRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardHomePage />} />
