@@ -15,6 +15,12 @@ import {
   CalendarDays as CalendarViewIcon,
   List,
   Layers3,
+  ChevronRight,
+  Map as MapIcon,
+  CheckCircle2,
+  Settings2,
+  ArrowRight,
+  Navigation2
 } from 'lucide-react';
 import { CircleMarker, MapContainer, Popup, Polyline, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -30,28 +36,11 @@ import { tripsService } from '../../services/trips.service.js';
 import { stopsService } from '../../services/stops.service.js';
 import { activitiesService } from '../../services/activities.service.js';
 
-const ACTIVITY_TYPES = ['sightseeing', 'food', 'transport', 'adventure', 'relaxation', 'culture', 'shopping', 'other'];
-const BUDGET_LEVELS = ['low', 'medium', 'high'];
-
-function moveItem(items, fromIndex, toIndex) {
-  const next = [...items];
-  const [item] = next.splice(fromIndex, 1);
-  next.splice(toIndex, 0, item);
-  return next;
-}
-
 function toDateInput(value) {
   if (!value) return '';
   const date = new Date(value);
   const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return offsetDate.toISOString().slice(0, 10);
-}
-
-function toDateTimeLocal(value) {
-  if (!value) return '';
-  const date = new Date(value);
-  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return offsetDate.toISOString().slice(0, 16);
 }
 
 function toIsoDate(value) {
@@ -62,872 +51,325 @@ function toIsoDate(value) {
 async function geocodeCity(cityName, countryName) {
   const query = [cityName, countryName].filter(Boolean).join(', ');
   if (!query) return null;
-
   try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`,
-      { headers: { Accept: 'application/json' } },
-    );
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`);
     const data = await response.json();
     if (!Array.isArray(data) || !data[0]) return null;
-    return {
-      lat: Number(data[0].lat),
-      lng: Number(data[0].lon),
-    };
-  } catch {
-    return null;
-  }
+    return { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+  } catch { return null; }
 }
 
 export default function ItineraryBuilderPage() {
   const { tripId } = useParams();
   const navigate = useNavigate();
-  const dragRef = useRef(null);
-
+  const [activeStep, setActiveStep] = useState(1);
+  const [leftWidth, setLeftWidth] = useState(55); // percentage
   const [trip, setTrip] = useState(null);
   const [stops, setStops] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('list');
-
   const [cityQuery, setCityQuery] = useState('');
   const [cityResults, setCityResults] = useState([]);
   const [selectedStopId, setSelectedStopId] = useState('');
-
-  const [activityQuery, setActivityQuery] = useState({
-    city: '',
-    country: '',
-    type: '',
-    budget: 'medium',
-    duration: '',
-    limit: 6,
-  });
+  const [coordinatesByStop, setCoordinatesByStop] = useState({});
   const [activityIdeas, setActivityIdeas] = useState([]);
   const [searchingActivities, setSearchingActivities] = useState(false);
 
-  const [coordinatesByStop, setCoordinatesByStop] = useState({});
+  const isResizing = useRef(false);
 
   useEffect(() => {
-    let alive = true;
-
-    async function loadTrip() {
-      setLoading(true);
+    async function load() {
       try {
-        const [tripResponse, stopsResponse] = await Promise.all([
-          tripsService.getOne(tripId),
-          stopsService.getAll(tripId),
-        ]);
-
-        if (!alive) return;
-
-        setTrip(tripResponse.data.data);
-        setStops(stopsResponse.data.data || []);
-
-        const firstStop = stopsResponse.data.data?.[0]?.stop?.id || '';
-        setSelectedStopId(firstStop);
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Failed to load itinerary.');
-      } finally {
-        if (alive) setLoading(false);
-      }
+        const [t, s] = await Promise.all([tripsService.getOne(tripId), stopsService.getAll(tripId)]);
+        setTrip(t.data.data);
+        const stopsData = s.data.data || [];
+        setStops(stopsData);
+        if (stopsData[0]) setSelectedStopId(stopsData[0].stop.id);
+      } catch (e) { toast.error('Failed to load itinerary.'); }
+      finally { setLoading(false); }
     }
-
-    loadTrip();
-
-    return () => {
-      alive = false;
-    };
+    load();
   }, [tripId]);
 
   useEffect(() => {
-    let alive = true;
-
-    if (cityQuery.trim().length < 2) {
-      setCityResults([]);
-      return undefined;
-    }
-
+    if (cityQuery.trim().length < 2) { setCityResults([]); return; }
     const timer = setTimeout(() => {
-      citiesService
-        .search({ q: cityQuery.trim(), limit: 8 })
-        .then((response) => {
-          if (alive) setCityResults(response.data.data || []);
-        })
-        .catch(() => {
-          if (alive) setCityResults([]);
-        });
-    }, 250);
-
-    return () => {
-      alive = false;
-      clearTimeout(timer);
-    };
+      citiesService.search({ q: cityQuery.trim(), limit: 5 }).then(r => setCityResults(r.data.data || []));
+    }, 300);
+    return () => clearTimeout(timer);
   }, [cityQuery]);
 
   useEffect(() => {
-    const activeStop = stops.find((entry) => entry.stop.id === selectedStopId);
-    if (!activeStop?.city) return;
-
-    setActivityQuery((current) => ({
-      ...current,
-      city: activeStop.city.name,
-      country: activeStop.city.country,
-    }));
-  }, [selectedStopId, stops]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadCoordinates() {
-      const pairs = await Promise.all(
-        stops.map(async (entry) => {
-          if (!entry.city) return null;
-          const coords = await geocodeCity(entry.city.name, entry.city.country);
-          if (!coords) return null;
-          return [entry.stop.id, coords];
-        }),
-      );
-
-      if (!cancelled) {
-        setCoordinatesByStop(Object.fromEntries(pairs.filter(Boolean)));
-      }
+    async function loadCoords() {
+      const pairs = await Promise.all(stops.map(async (e) => {
+        if (!e.city) return null;
+        const c = await geocodeCity(e.city.name, e.city.country);
+        return c ? [e.stop.id, c] : null;
+      }));
+      setCoordinatesByStop(Object.fromEntries(pairs.filter(Boolean)));
     }
-
-    if (stops.length > 0) {
-      loadCoordinates();
-    } else {
-      setCoordinatesByStop({});
-    }
-
-    return () => {
-      cancelled = true;
-    };
+    if (stops.length > 0) loadCoords();
   }, [stops]);
 
-  const selectedStop = useMemo(
-    () => stops.find((entry) => entry.stop.id === selectedStopId) || stops[0] || null,
-    [stops, selectedStopId],
-  );
-
-  const totalActivities = useMemo(
-    () => stops.reduce((count, entry) => count + entry.activities.length, 0),
-    [stops],
-  );
-
-  const totalActivityCost = useMemo(
-    () =>
-      stops.reduce(
-        (sum, entry) =>
-          sum + entry.activities.reduce((stopSum, activity) => stopSum + Number(activity.cost || 0), 0),
-        0,
-      ),
-    [stops],
-  );
-
-  const mapPoints = useMemo(
-    () => stops.map((entry) => coordinatesByStop[entry.stop.id]).filter(Boolean),
-    [coordinatesByStop, stops],
-  );
-
+  const mapPoints = useMemo(() => stops.map(e => coordinatesByStop[e.stop.id]).filter(Boolean), [coordinatesByStop, stops]);
   const center = mapPoints[0] || { lat: 20, lng: 0 };
 
-  async function handleAddStop(city) {
+  const startResizing = () => { isResizing.current = true; };
+  const stopResizing = () => { isResizing.current = false; };
+  const resize = (e) => {
+    if (!isResizing.current) return;
+    const newWidth = (e.clientX / window.innerWidth) * 100;
+    if (newWidth > 30 && newWidth < 80) setLeftWidth(newWidth);
+  };
+
+  useEffect(() => {
+    window.addEventListener('mousemove', resize);
+    window.addEventListener('mouseup', stopResizing);
+    return () => {
+      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mouseup', stopResizing);
+    };
+  }, []);
+
+  const handleAddStop = async (city) => {
     try {
-      const stopResponse = await stopsService.create(tripId, { cityId: city.id });
-      const stop = stopResponse.data.data;
-      setStops((current) => [...current, { stop, city, activities: [] }]);
-      setSelectedStopId(stop.id);
+      const r = await stopsService.create(tripId, { cityId: city.id });
+      setStops(curr => [...curr, { stop: r.data.data, city, activities: [] }]);
+      setSelectedStopId(r.data.data.id);
       setCityQuery('');
       setCityResults([]);
-      toast.success(`${city.name} added to your trip.`);
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to add stop.');
-    }
-  }
+      toast.success(`${city.name} added.`);
+    } catch { toast.error('Error.'); }
+  };
 
-  async function handleStopDateChange(stopId, field, value) {
-    const payload = { [field]: toIsoDate(value) };
+  const handleDateChange = async (stopId, field, val) => {
+    const iso = toIsoDate(val);
+    setStops(curr => curr.map(e => e.stop.id === stopId ? { ...e, stop: { ...e.stop, [field]: iso } } : e));
+    await stopsService.update(tripId, stopId, { [field]: iso });
+  };
 
-    setStops((current) =>
-      current.map((entry) =>
-        entry.stop.id === stopId
-          ? { ...entry, stop: { ...entry.stop, [field]: payload[field] } }
-          : entry,
-      ),
-    );
+  const handleDeleteStop = async (id) => {
+    await stopsService.remove(tripId, id);
+    setStops(curr => curr.filter(e => e.stop.id !== id));
+  };
 
-    try {
-      await stopsService.update(tripId, stopId, payload);
-    } catch {
-      toast.error('Failed to save stop dates.');
-    }
-  }
-
-  async function handleDeleteStop(stopId) {
-    try {
-      await stopsService.remove(tripId, stopId);
-      setStops((current) => {
-        const remainingStops = current.filter((entry) => entry.stop.id !== stopId);
-        if (selectedStopId === stopId) {
-          setSelectedStopId(remainingStops[0]?.stop.id || '');
-        }
-        return remainingStops;
-      });
-      toast.success('Stop removed.');
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to remove stop.');
-    }
-  }
-
-  async function persistStopOrder(nextStops) {
-    setStops(nextStops);
-    try {
-      await stopsService.reorder(tripId, nextStops.map((entry) => entry.stop.id));
-    } catch {
-      toast.error('Failed to save stop order.');
-    }
-  }
-
-  function handleStopDragStart(index) {
-    dragRef.current = { type: 'stop', index };
-  }
-
-  function handleStopDrop(index) {
-    const dragState = dragRef.current;
-    dragRef.current = null;
-
-    if (!dragState || dragState.type !== 'stop' || dragState.index === index) return;
-
-    const nextStops = moveItem(stops, dragState.index, index);
-    persistStopOrder(nextStops);
-  }
-
-  function handleActivityDragStart(stopId, index) {
-    dragRef.current = { type: 'activity', stopId, index };
-  }
-
-  function handleActivityDrop(stopId, index) {
-    const dragState = dragRef.current;
-    dragRef.current = null;
-
-    if (!dragState || dragState.type !== 'activity' || dragState.stopId !== stopId || dragState.index === index) {
-      return;
-    }
-
-    const nextStops = stops.map((entry) => {
-      if (entry.stop.id !== stopId) return entry;
-      const nextActivities = moveItem(entry.activities, dragState.index, index);
-      void activitiesService.reorder(tripId, stopId, nextActivities.map((activity) => activity.id));
-      return { ...entry, activities: nextActivities };
-    });
-
-    setStops(nextStops);
-  }
-
-  async function handleAddActivity(activity) {
-    if (!selectedStop) {
-      toast.error('Pick a stop first.');
-      return;
-    }
-
-    try {
-      const createdResponse = await activitiesService.create(tripId, selectedStop.stop.id, activity);
-      const created = createdResponse.data.data;
-      setStops((current) =>
-        current.map((entry) =>
-          entry.stop.id === selectedStop.stop.id
-            ? { ...entry, activities: [...entry.activities, created] }
-            : entry,
-        ),
-      );
-      toast.success('Activity added to the stop.');
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to add activity.');
-    }
-  }
-
-  async function handleUpdateActivity(stopId, activityId, field, value) {
-    const payload = { [field]: value };
-
-    if (field === 'cost') payload[field] = value === '' ? 0 : Number(value);
-    if (field === 'startTime' || field === 'endTime') payload[field] = value ? new Date(value).toISOString() : null;
-
-    setStops((current) =>
-      current.map((entry) =>
-        entry.stop.id === stopId
-          ? {
-              ...entry,
-              activities: entry.activities.map((activity) =>
-                activity.id === activityId
-                  ? {
-                      ...activity,
-                      [field]: payload[field],
-                    }
-                  : activity,
-              ),
-            }
-          : entry,
-      ),
-    );
-
-    try {
-      await activitiesService.update(tripId, stopId, activityId, payload);
-    } catch {
-      toast.error('Failed to save activity changes.');
-    }
-  }
-
-  async function handleDeleteActivity(stopId, activityId) {
-    try {
-      await activitiesService.remove(tripId, stopId, activityId);
-      setStops((current) =>
-        current.map((entry) =>
-          entry.stop.id === stopId
-            ? { ...entry, activities: entry.activities.filter((activity) => activity.id !== activityId) }
-            : entry,
-        ),
-      );
-      toast.success('Activity removed.');
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to remove activity.');
-    }
-  }
-
-  async function handleSearchActivities(event) {
-    event.preventDefault();
-
-    const stop = selectedStop;
-    const city = activityQuery.city || stop?.city?.name || trip?.name || 'Everywhere';
-
-    setSearchingActivities(true);
-    try {
-      const response = await activitiesService.searchIdeas({
-        city,
-        country: activityQuery.country || stop?.city?.country || '',
-        type: activityQuery.type || '',
-        budget: activityQuery.budget,
-        duration: activityQuery.duration || '',
-        limit: activityQuery.limit,
-      });
-
-      setActivityIdeas(response.data.data || []);
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to search activities.');
-    } finally {
-      setSearchingActivities(false);
-    }
-  }
-
-  async function handleAddIdeaToStop(idea) {
-    if (!selectedStop) {
-      toast.error('Pick a stop first.');
-      return;
-    }
-
-    await handleAddActivity({
-      name: idea.name,
-      type: idea.type,
-      cost: idea.cost,
-      duration: idea.duration,
-      notes: idea.notes,
-    });
-  }
-
-  if (loading) {
-    return (
-      <div className="mx-auto max-w-7xl space-y-8 pb-12">
-        <StopSkeleton count={3} />
-      </div>
-    );
-  }
+  if (loading) return <div className="p-12 h-screen flex items-center justify-center bg-white"><StopSkeleton count={3} /></div>;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 pb-12">
-      <PageHeader
-        title={trip?.name || 'Itinerary Builder'}
-        subtitle="Build your route, sort activities by day, and search ideas with live filters."
-        action={(
-          <div className="flex flex-wrap items-center gap-3">
-            <Button variant="secondary" onClick={() => navigate('/trips')}>
-              <ChevronLeft size={16} />
-              Back to trips
-            </Button>
-            <Button variant={viewMode === 'list' ? 'primary' : 'secondary'} onClick={() => setViewMode('list')}>
-              <List size={16} />
-              List view
-            </Button>
-            <Button variant={viewMode === 'calendar' ? 'primary' : 'secondary'} onClick={() => setViewMode('calendar')}>
-              <CalendarViewIcon size={16} />
-              Calendar view
-            </Button>
-            <Button as={Link} to={`/trips/${tripId}/view`} variant="secondary" size="sm">
-              <MapPinned size={14} />
-              View Itinerary
-            </Button>
-            <Button as={Link} to={`/trips/${tripId}/budget`} variant="secondary">
-              Budget
-            </Button>
-            <Button as={Link} to={`/trips/${tripId}/packing`} variant="secondary">
-              Packing
-            </Button>
-            <Button as={Link} to={`/trips/${tripId}/notes`} variant="secondary">
-              Notes
-            </Button>
-          </div>
-        )}
-      />
-
-      <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-6">
-          {/* Welcome / Empty State Guide */}
-          {stops.length === 0 && (
-            <Card className="bg-linear-to-br from-(--app-color-primary) to-slate-900 text-white border-none shadow-2xl overflow-hidden relative group">
-              <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-              <div className="relative z-10 p-8">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center border border-white/30 shadow-inner">
-                    <Sparkles className="text-white animate-pulse" size={32} />
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-black tracking-tight">Let's build your journey.</h2>
-                    <p className="text-white/70 font-medium">Follow these 3 simple steps to create a world-class itinerary.</p>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-4 mt-8">
-                  {[
-                    { step: '01', title: 'Add Cities', desc: 'Use the search box below to add your first destination.', icon: MapPin },
-                    { step: '02', title: 'Set Dates', desc: 'Define when you arrive and leave each city stop.', icon: CalendarDays },
-                    { step: '03', title: 'Add Activities', desc: 'Search and attach things to do at each destination.', icon: CirclePlus },
-                  ].map((item, i) => (
-                    <div key={i} className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:border-white/30 transition-all">
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-xs font-black px-2 py-0.5 rounded-full bg-white/20">{item.step}</span>
-                        <item.icon size={20} className="text-white/60" />
-                      </div>
-                      <h4 className="font-bold mb-1">{item.title}</h4>
-                      <p className="text-xs text-white/60 leading-relaxed">{item.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-          )}
-
-          <Card
-            title="Step 1: Add destinations"
-            subtitle="Search cities by country, popularity, and cost index."
-            headerAction={<span className="text-sm font-medium text-(--app-color-text-muted)">{stops.length} stops</span>}
-            className="p-0"
+    <div className="flex h-[calc(100vh-56px)] lg:h-screen overflow-hidden bg-white select-none">
+      
+      {/* ── Fixed Step Indicator ── */}
+      <div className="w-16 flex flex-col items-center py-8 bg-slate-50 border-r border-slate-100 shrink-0">
+        {[1, 2, 3].map(s => (
+          <button 
+            key={s}
+            onClick={() => setActiveStep(s)}
+            className={`mb-10 flex flex-col items-center transition-all ${activeStep === s ? 'text-(--app-color-primary)' : 'text-slate-300'}`}
           >
-            <div className="space-y-4 p-6">
-              <Input
-                label="Search cities"
-                value={cityQuery}
-                onChange={(event) => setCityQuery(event.target.value)}
-                placeholder="Type a city or country"
-                icon={Search}
-              />
-
-              {cityResults.length > 0 && (
-                <div className="grid gap-3 md:grid-cols-2">
-                  {cityResults.map((city) => (
-                    <button
-                      key={city.id}
-                      type="button"
-                      onClick={() => handleAddStop(city)}
-                      className="flex items-center justify-between rounded-2xl border border-(--app-color-border) bg-(--app-color-surface-elevated) px-4 py-3 text-left transition-colors hover:border-(--app-color-primary) hover:bg-(--app-color-primary-soft)"
-                    >
-                      <div>
-                        <p className="font-semibold text-(--app-color-text)">{city.name}</p>
-                        <p className="text-sm text-(--app-color-text-muted)">{city.country}</p>
-                      </div>
-                      <div className="text-right text-xs font-semibold uppercase tracking-widest text-(--app-color-text-muted)">
-                        <p>{city.costIndex}</p>
-                        <p>{city.popularity} pop</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {cityQuery.trim().length >= 2 && cityResults.length === 0 && (
-                <div className="rounded-2xl border border-dashed border-(--app-color-border) p-8 text-center">
-                   <Search size={24} className="mx-auto mb-3 text-slate-300" />
-                   <p className="text-sm text-(--app-color-text-muted)">No cities found matching "{cityQuery}".</p>
-                   <p className="text-xs text-slate-400 mt-1">Try a different name or check the spelling.</p>
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center gap-3 text-sm text-(--app-color-text-muted)">
-                <span className="flex items-center gap-2 rounded-full bg-(--app-color-primary-soft) px-3 py-1 text-(--app-color-primary)"><Route size={14} /> {stops.length} destinations</span>
-                <span className="flex items-center gap-2 rounded-full bg-(--app-color-surface-elevated) px-3 py-1"><Sparkles size={14} /> {totalActivities} activities</span>
-                <span className="flex items-center gap-2 rounded-full bg-(--app-color-surface-elevated) px-3 py-1"><CirclePlus size={14} /> ${totalActivityCost.toFixed(2)} planned activity cost</span>
-              </div>
+            <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-xs font-black transition-all ${activeStep === s ? 'bg-(--app-color-primary) text-white shadow-lg' : 'bg-white border border-slate-200'}`}>
+              {s}
             </div>
-          </Card>
-
-          {viewMode === 'list' ? (
-            <div className="space-y-4">
-              {stops.map((entry, index) => (
-                <Card
-                  key={entry.stop.id}
-                  className="p-0"
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={() => handleStopDrop(index)}
-                >
-                  <div className="border-b border-(--app-color-border) bg-(--app-color-surface-elevated) px-5 py-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-3">
-                        <button
-                          type="button"
-                          draggable
-                          onDragStart={() => handleStopDragStart(index)}
-                          className="mt-0.5 rounded-lg border border-(--app-color-border) bg-white p-2 text-(--app-color-text-muted)"
-                          aria-label="Reorder stop"
-                        >
-                          <GripVertical size={16} />
-                        </button>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="rounded-full bg-(--app-color-primary) px-2 py-0.5 text-xs font-bold text-white">{index + 1}</span>
-                            <h3 className="text-lg font-bold text-(--app-color-text)">{entry.city?.name || 'Unknown city'}</h3>
-                          </div>
-                          <p className="mt-1 text-sm text-(--app-color-text-muted)">{entry.city?.country} · Cost index {entry.city?.costIndex || 'medium'}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Button variant="secondary" size="sm" onClick={() => setSelectedStopId(entry.stop.id)}>
-                          Focus
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteStop(entry.stop.id)} className="text-red-600 hover:bg-red-50">
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="mt-4 grid gap-3 md:grid-cols-2">
-                      <Input
-                        label="Arrival date"
-                        type="date"
-                        value={toDateInput(entry.stop.arrivalDate)}
-                        onChange={(event) => handleStopDateChange(entry.stop.id, 'arrivalDate', event.target.value)}
-                      />
-                      <Input
-                        label="Departure date"
-                        type="date"
-                        value={toDateInput(entry.stop.departureDate)}
-                        onChange={(event) => handleStopDateChange(entry.stop.id, 'departureDate', event.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 p-5">
-                    {entry.activities.length === 0 ? (
-                      <div className="rounded-2xl border border-dashed border-(--app-color-border) p-5 text-sm text-(--app-color-text-muted)">
-                        No activities yet. Search ideas on the right, then add them here.
-                      </div>
-                    ) : (
-                      entry.activities.map((activity, activityIndex) => (
-                        <div
-                          key={activity.id}
-                          className="rounded-2xl border border-(--app-color-border) bg-white p-4"
-                          draggable
-                          onDragStart={() => handleActivityDragStart(entry.stop.id, activityIndex)}
-                          onDragOver={(event) => event.preventDefault()}
-                          onDrop={() => handleActivityDrop(entry.stop.id, activityIndex)}
-                        >
-                          <div className="flex items-start gap-3">
-                            <button
-                              type="button"
-                              className="mt-1 rounded-lg border border-(--app-color-border) bg-(--app-color-surface-elevated) p-2 text-(--app-color-text-muted)"
-                              aria-label="Reorder activity"
-                              draggable
-                              onDragStart={() => handleActivityDragStart(entry.stop.id, activityIndex)}
-                            >
-                              <GripVertical size={14} />
-                            </button>
-
-                            <div className="grid flex-1 gap-3 md:grid-cols-2">
-                              <Input
-                                value={activity.name}
-                                onChange={(event) => handleUpdateActivity(entry.stop.id, activity.id, 'name', event.target.value)}
-                                placeholder="Activity name"
-                              />
-
-                              <label className="text-sm font-medium text-(--app-color-text)">
-                                Type
-                                <select
-                                  value={activity.type}
-                                  onChange={(event) => handleUpdateActivity(entry.stop.id, activity.id, 'type', event.target.value)}
-                                  className="mt-2 w-full rounded-lg border border-(--app-color-border) bg-white px-3 py-2 text-sm"
-                                >
-                                  {ACTIVITY_TYPES.map((type) => (
-                                    <option key={type} value={type}>
-                                      {type}
-                                    </option>
-                                  ))}
-                                </select>
-                              </label>
-
-                              <Input
-                                label="Cost"
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={activity.cost}
-                                onChange={(event) => handleUpdateActivity(entry.stop.id, activity.id, 'cost', event.target.value)}
-                              />
-
-                              <Input
-                                label="Duration"
-                                value={activity.duration || ''}
-                                onChange={(event) => handleUpdateActivity(entry.stop.id, activity.id, 'duration', event.target.value)}
-                                placeholder="2 hours"
-                              />
-
-                              <Input
-                                label="Start time"
-                                type="datetime-local"
-                                value={toDateTimeLocal(activity.startTime)}
-                                onChange={(event) => handleUpdateActivity(entry.stop.id, activity.id, 'startTime', event.target.value)}
-                              />
-
-                              <Input
-                                label="End time"
-                                type="datetime-local"
-                                value={toDateTimeLocal(activity.endTime)}
-                                onChange={(event) => handleUpdateActivity(entry.stop.id, activity.id, 'endTime', event.target.value)}
-                              />
-                            </div>
-
-                            <Button variant="ghost" size="sm" onClick={() => handleDeleteActivity(entry.stop.id, activity.id)} className="text-red-600 hover:bg-red-50">
-                              <Trash2 size={14} />
-                            </Button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-
-                    <div className="flex flex-wrap gap-3 pt-2">
-                      <Button variant="secondary" size="sm" onClick={() => setSelectedStopId(entry.stop.id)}>
-                        <Layers3 size={14} />
-                        Search ideas for this stop
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {stops.map((entry, index) => (
-                <Card key={entry.stop.id} className="p-0">
-                  <div className="border-b border-(--app-color-border) bg-linear-to-r from-(--app-color-primary-soft) to-white px-5 py-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-widest text-(--app-color-primary)">Day {index + 1}</p>
-                        <h3 className="mt-1 text-lg font-bold text-(--app-color-text)">{entry.city?.name || 'Unknown city'}</h3>
-                        <p className="text-sm text-(--app-color-text-muted)">{entry.city?.country}</p>
-                      </div>
-                      <button
-                        type="button"
-                        draggable
-                        onDragStart={() => handleStopDragStart(index)}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDrop={() => handleStopDrop(index)}
-                        className="rounded-full border border-(--app-color-border) bg-white p-2 text-(--app-color-text-muted)"
-                        aria-label="Reorder stop"
-                      >
-                        <GripVertical size={16} />
-                      </button>
-                    </div>
-                    <p className="mt-3 text-sm text-(--app-color-text-muted)">
-                      {toDateInput(entry.stop.arrivalDate) || 'Open arrival'} → {toDateInput(entry.stop.departureDate) || 'Open departure'}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3 p-5">
-                    {entry.activities.slice(0, 3).map((activity) => (
-                      <div key={activity.id} className="rounded-2xl border border-(--app-color-border) bg-(--app-color-surface-elevated) px-4 py-3">
-                        <p className="font-semibold text-(--app-color-text)">{activity.name}</p>
-                        <p className="mt-1 text-xs uppercase tracking-widest text-(--app-color-text-muted)">
-                          {activity.type} · ${Number(activity.cost || 0).toFixed(2)}
-                        </p>
-                      </div>
-                    ))}
-
-                    {entry.activities.length === 0 && (
-                      <div className="rounded-2xl border border-dashed border-(--app-color-border) px-4 py-6 text-center text-sm text-(--app-color-text-muted)">
-                        Add activities to this day from the search panel.
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-
-          <Card title="Route map" subtitle="Leaflet map preview of the stops you've added.">
-            {mapPoints.length > 0 ? (
-              <div className="h-96 overflow-hidden rounded-2xl border border-(--app-color-border)">
-                <MapContainer center={[center.lat, center.lng]} zoom={4} scrollWheelZoom className="h-full w-full">
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  {mapPoints.length > 1 && <Polyline positions={mapPoints.map((point) => [point.lat, point.lng])} pathOptions={{ color: '#0f766e', weight: 4 }} />}
-                  {stops.map((entry) => {
-                    const coords = coordinatesByStop[entry.stop.id];
-                    if (!coords) return null;
-                    return (
-                      <CircleMarker
-                        key={entry.stop.id}
-                        center={[coords.lat, coords.lng]}
-                        radius={10}
-                        pathOptions={{ color: '#7c3aed', fillColor: '#0f766e', fillOpacity: 0.85 }}
-                      >
-                        <Popup>
-                          <strong>{entry.city?.name}</strong>
-                          <br />
-                          {entry.city?.country}
-                        </Popup>
-                      </CircleMarker>
-                    );
-                  })}
-                </MapContainer>
-              </div>
-            ) : (
-              <div className="flex h-80 items-center justify-center rounded-2xl border-2 border-dashed border-(--app-color-border) bg-slate-50/50 text-slate-400">
-                <div className="text-center max-w-xs px-6">
-                  <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto mb-6">
-                    <MapPinned size={32} className="text-slate-300" />
-                  </div>
-                  <h4 className="text-lg font-bold text-slate-900 mb-2">Map is waiting for stops</h4>
-                  <p className="text-sm leading-relaxed mb-6">Once you add cities in **Step 1**, we'll automatically plot them on this interactive map and calculate the routes for you.</p>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-black uppercase tracking-widest text-white shadow-lg">
-                    Start by searching above
-                  </div>
-                </div>
-              </div>
-            )}
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card
-            title="Activity search"
-            subtitle="Generate activity ideas with filters for type, cost, and duration."
-          >
-            <form className="grid gap-4" onSubmit={handleSearchActivities}>
-              <Input
-                label="City"
-                value={activityQuery.city}
-                onChange={(event) => setActivityQuery((current) => ({ ...current, city: event.target.value }))}
-                placeholder="Use the active stop or type one in"
-              />
-
-              <Input
-                label="Country"
-                value={activityQuery.country}
-                onChange={(event) => setActivityQuery((current) => ({ ...current, country: event.target.value }))}
-                placeholder="Optional"
-              />
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <label className="text-sm font-medium text-(--app-color-text)">
-                  Type
-                  <select
-                    value={activityQuery.type}
-                    onChange={(event) => setActivityQuery((current) => ({ ...current, type: event.target.value }))}
-                    className="mt-2 w-full rounded-lg border border-(--app-color-border) bg-white px-3 py-2 text-sm"
-                  >
-                    <option value="">Any</option>
-                    {ACTIVITY_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="text-sm font-medium text-(--app-color-text)">
-                  Budget
-                  <select
-                    value={activityQuery.budget}
-                    onChange={(event) => setActivityQuery((current) => ({ ...current, budget: event.target.value }))}
-                    className="mt-2 w-full rounded-lg border border-(--app-color-border) bg-white px-3 py-2 text-sm"
-                  >
-                    {BUDGET_LEVELS.map((level) => (
-                      <option key={level} value={level}>
-                        {level}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <Input
-                label="Duration"
-                value={activityQuery.duration}
-                onChange={(event) => setActivityQuery((current) => ({ ...current, duration: event.target.value }))}
-                placeholder="2 hours, half day, evening, etc."
-              />
-
-              <Button type="submit" loading={searchingActivities} fullWidth>
-                <Search size={16} />
-                Search activity ideas
-              </Button>
-            </form>
-          </Card>
-
-          <Card title="Search results" subtitle="Add ideas to the selected stop.">
-            <div className="space-y-3">
-              {!selectedStop && (
-                <div className="rounded-2xl border border-dashed border-(--app-color-border) px-4 py-6 text-center text-sm text-(--app-color-text-muted)">
-                  Add a stop first, then search activities for it.
-                </div>
-              )}
-
-              {activityIdeas.length === 0 && selectedStop && !searchingActivities && (
-                <div className="rounded-2xl border border-dashed border-(--app-color-border) px-4 py-6 text-center text-sm text-(--app-color-text-muted)">
-                  Run a search to see activity suggestions.
-                </div>
-              )}
-
-              {activityIdeas.map((idea, index) => (
-                <div key={`${idea.name}-${index}`} className="rounded-2xl border border-(--app-color-border) bg-(--app-color-surface-elevated) p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="font-semibold text-(--app-color-text)">{idea.name}</p>
-                      <p className="mt-1 text-xs uppercase tracking-widest text-(--app-color-text-muted)">
-                        {idea.type} · ${Number(idea.cost || 0).toFixed(2)} · {idea.duration}
-                      </p>
-                      {idea.notes && <p className="mt-2 text-sm text-(--app-color-text-muted)">{idea.notes}</p>}
-                    </div>
-
-                    <Button variant="secondary" size="sm" onClick={() => handleAddIdeaToStop(idea)} disabled={!selectedStop}>
-                      <Plus size={14} />
-                      Add
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          <Card title="Selected stop">
-            {selectedStop ? (
-              <div className="space-y-2 text-sm text-(--app-color-text-muted)">
-                <p className="font-semibold text-(--app-color-text)">{selectedStop.city?.name}</p>
-                <p>{selectedStop.city?.country}</p>
-                <p>{selectedStop.activities.length} activities attached</p>
-              </div>
-            ) : (
-              <p className="text-sm text-(--app-color-text-muted)">Choose a stop to focus the activity search.</p>
-            )}
-          </Card>
+            <span className="mt-2 text-[8px] font-black uppercase tracking-widest">Step {s}</span>
+          </button>
+        ))}
+        <div className="mt-auto">
+           <button onClick={() => navigate('/trips')} className="h-8 w-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+             <ChevronLeft size={16} />
+           </button>
         </div>
       </div>
+
+      {/* ── Left Workspace (Resizable) ── */}
+      <div 
+        className="flex flex-col min-w-0 h-full relative" 
+        style={{ width: `${leftWidth}%` }}
+      >
+        <div className="h-16 px-6 flex items-center justify-between bg-white border-b border-slate-100 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-(--app-color-primary-soft) flex items-center justify-center text-(--app-color-primary)">
+               <Settings2 size={14} />
+            </div>
+            <div>
+              <h1 className="text-xs font-black text-slate-900 uppercase tracking-tight">{trip?.name}</h1>
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Step {activeStep} <span className="mx-1">•</span> {activeStep === 1 ? 'Discovery' : activeStep === 2 ? 'Planning' : 'Intelligence'}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+             <div className="hidden md:flex gap-1.5">
+                {[1, 2, 3].map(s => <div key={s} className={`h-1 w-6 rounded-full transition-all ${activeStep >= s ? 'bg-(--app-color-primary)' : 'bg-slate-100'}`} />)}
+             </div>
+             <Button as={Link} to={`/trips/${tripId}/view`} variant="secondary" size="xs" className="rounded-lg text-[9px] uppercase font-black">Finish</Button>
+          </div>
+        </div>
+
+        <div className="flex-1 p-8 bg-slate-50/20 overflow-hidden flex flex-col">
+          <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full overflow-hidden">
+            
+            {activeStep === 1 && (
+              <div className="flex flex-col h-full space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
+                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm shrink-0">
+                  <h2 className="text-sm font-black text-slate-900 uppercase mb-4 tracking-tight">Step 1: Add Destinations</h2>
+                  <div className="relative">
+                    <Input 
+                      value={cityQuery}
+                      onChange={(e) => setCityQuery(e.target.value)}
+                      placeholder="Search a global city..."
+                      className="text-xs py-4 rounded-xl border-slate-200"
+                      icon={Search}
+                    />
+                    {cityResults.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-100 rounded-xl shadow-xl z-50 overflow-hidden">
+                        {cityResults.map(city => (
+                          <button key={city.id} onClick={() => handleAddStop(city)} className="w-full px-5 py-3 flex items-center justify-between hover:bg-slate-50 group transition-all">
+                            <div className="text-left"><p className="font-bold text-slate-900 text-xs">{city.name}</p><p className="text-[8px] text-slate-400 uppercase font-black">{city.country}</p></div>
+                            <Plus size={14} className="text-slate-300 group-hover:text-(--app-color-primary)" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 px-1">Planned Nodes ({stops.length})</h3>
+                  <div className="flex-1 overflow-y-auto space-y-2 pr-2 scrollbar-hide">
+                    {stops.map((e, i) => (
+                      <div key={e.stop.id} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl shadow-xs group">
+                        <span className="h-6 w-6 rounded-md bg-(--app-color-primary) text-white flex items-center justify-center text-[10px] font-black">{i + 1}</span>
+                        <div className="flex-1 truncate"><p className="font-bold text-slate-900 text-xs leading-none mb-0.5 truncate">{e.city?.name}</p><p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{e.city?.country}</p></div>
+                        <button onClick={() => handleDeleteStop(e.stop.id)} className="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={12} /></button>
+                      </div>
+                    ))}
+                    {stops.length === 0 && <div className="p-8 text-center border border-dashed border-slate-200 rounded-2xl text-[10px] text-slate-400 uppercase font-black">Search above to add stops</div>}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeStep === 2 && (
+              <div className="flex flex-col h-full space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
+                <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm shrink-0">
+                  <h2 className="text-xs font-black text-slate-900 uppercase tracking-tighter">Temporal Planning</h2>
+                  <p className="text-[9px] text-slate-400 font-medium mt-1 uppercase tracking-widest">Assign arrival and departure dates to calibrate your journey timeline.</p>
+                </div>
+                <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-hide">
+                   {stops.length === 0 ? (
+                     <div className="text-center py-20 bg-white border border-dashed border-slate-200 rounded-2xl">
+                        <p className="text-slate-400 font-bold text-[9px] uppercase tracking-widest">Awaiting destination inputs</p>
+                     </div>
+                   ) : stops.map((e, i) => (
+                     <div key={e.stop.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
+                        <div className="flex items-center gap-3">
+                           <div className="h-7 w-7 rounded-lg bg-(--app-color-primary) text-white flex items-center justify-center text-[10px] font-black">{i + 1}</div>
+                           <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-tight">{e.city?.name}</h3>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-1">Check-in</label>
+                            <input 
+                              type="date" 
+                              value={toDateInput(e.stop.arrivalDate)} 
+                              onChange={(ev) => handleDateChange(e.stop.id, 'arrivalDate', ev.target.value)} 
+                              className="w-full bg-slate-50 border-none rounded-xl h-10 px-4 text-[10px] focus:ring-1 focus:ring-(--app-color-primary) transition-all"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-1">Check-out</label>
+                            <input 
+                              type="date" 
+                              value={toDateInput(e.stop.departureDate)} 
+                              onChange={(ev) => handleDateChange(e.stop.id, 'departureDate', ev.target.value)} 
+                              className="w-full bg-slate-50 border-none rounded-xl h-10 px-4 text-[10px] focus:ring-1 focus:ring-(--app-color-primary) transition-all"
+                            />
+                          </div>
+                        </div>
+                     </div>
+                   ))}
+                </div>
+              </div>
+            )}
+
+            {activeStep === 3 && (
+              <div className="flex flex-col h-full space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-hidden">
+                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm shrink-0">
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Step 3: Context Intelligence</h2>
+                  <Button onClick={async () => {
+                      const stop = stops.find(x => x.stop.id === selectedStopId);
+                      if (!stop) return;
+                      setSearchingActivities(true);
+                      try {
+                        const r = await activitiesService.searchIdeas({ city: stop.city.name });
+                        setActivityIdeas(r.data.data || []);
+                      } catch { toast.error('Query failed.'); }
+                      finally { setSearchingActivities(false); }
+                   }} loading={searchingActivities} size="xs" fullWidth className="mt-4 rounded-lg h-9 text-[9px] uppercase font-black">Execute Discovery Engine</Button>
+                </div>
+                <div className="flex gap-1.5 overflow-x-auto pb-2 shrink-0 scrollbar-hide">
+                   {stops.map(e => (
+                     <button key={e.stop.id} onClick={() => setSelectedStopId(e.stop.id)} className={`shrink-0 px-4 py-2 rounded-lg font-bold text-[8px] uppercase tracking-widest transition-all ${selectedStopId === e.stop.id ? 'bg-(--app-color-primary) text-white shadow-md' : 'bg-white text-slate-400 border border-slate-100'}`}>{e.city?.name}</button>
+                   ))}
+                </div>
+                <div className="flex-1 overflow-y-auto grid sm:grid-cols-2 gap-2 pr-2 scrollbar-hide">
+                   {activityIdeas.map((idea, i) => (
+                      <div key={i} className="p-3 rounded-xl bg-white border border-slate-100 flex items-center justify-between gap-2 hover:border-(--app-color-primary-soft) transition-all">
+                        <div className="min-w-0"><p className="font-bold text-slate-900 text-[9px] truncate leading-none mb-1">{idea.name}</p><p className="text-[7px] text-slate-400 uppercase font-black tracking-widest">{idea.type} • {idea.duration}</p></div>
+                        <button onClick={async () => { await activitiesService.create(tripId, selectedStopId, idea); toast.success('Added.'); }} className="h-6 w-6 rounded bg-slate-50 flex items-center justify-center text-slate-300 hover:text-(--app-color-primary) transition-all"><Plus size={12} /></button>
+                      </div>
+                   ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+
+          <button onClick={() => activeStep < 3 && setActiveStep(s => s + 1)} className={`absolute bottom-6 right-6 flex items-center gap-2 bg-(--app-color-primary) text-white pl-5 pr-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest shadow-xl transition-all ${activeStep === 3 ? 'opacity-0 pointer-events-none' : 'hover:scale-105 active:scale-95'}`}>
+            Next Step <div className="h-5 w-5 rounded-md bg-white/20 flex items-center justify-center"><ArrowRight size={10} /></div>
+          </button>
+        </div>
+
+        {/* ── Resizer Handle (Visible Slider) ── */}
+        <div 
+          onMouseDown={startResizing}
+          className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize bg-slate-100 hover:bg-(--app-color-primary-soft) transition-colors z-50 group flex items-center justify-center border-r border-slate-200"
+        >
+          <div className="h-20 w-1.5 bg-slate-200 group-hover:bg-(--app-color-primary) rounded-full flex flex-col items-center justify-center gap-1 shadow-sm transition-all group-active:scale-y-125">
+             <div className="w-0.5 h-0.5 bg-white rounded-full" />
+             <div className="w-0.5 h-0.5 bg-white rounded-full" />
+             <div className="w-0.5 h-0.5 bg-white rounded-full" />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Map Context (Right View) ── */}
+      <div className="hidden lg:block h-full relative shrink-0 bg-slate-100" style={{ flex: 1 }}>
+        <MapContainer center={[center.lat, center.lng]} zoom={4} zoomControl={false} scrollWheelZoom className="h-full w-full grayscale-[0.6]">
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {mapPoints.length > 1 && <Polyline positions={mapPoints.map(p => [p.lat, p.lng])} className="neon-path" pathOptions={{ color: '#714B67', weight: 2 }} />}
+          {stops.map(e => {
+            const c = coordinatesByStop[e.stop.id];
+            if (!c) return null;
+            return (
+              <CircleMarker key={e.stop.id} center={[c.lat, c.lng]} radius={5} pathOptions={{ color: '#714B67', fillColor: '#714B67', fillOpacity: 1, weight: 1.5 }}>
+                <Popup className="custom-popup"><div className="p-2"><p className="font-black text-slate-900 text-[10px] mb-0.5">{e.city?.name}</p><p className="text-[7px] text-slate-400 uppercase font-black">{e.city?.country}</p></div></Popup>
+              </CircleMarker>
+            );
+          })}
+        </MapContainer>
+        <div className="absolute top-6 right-6">
+           <div className="bg-white/90 backdrop-blur-md p-4 px-6 rounded-2xl border border-white shadow-xl flex flex-col items-end min-w-[120px]">
+              <span className="text-[7px] font-black uppercase tracking-[0.2em] text-slate-400">Node Hub</span>
+              <p className="text-xl font-black text-slate-900 mt-0.5">{stops.length} ACTIVE</p>
+           </div>
+        </div>
+      </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes dash-animation { to { stroke-dashoffset: -20; } }
+        .neon-path { stroke-dasharray: 6, 10; animation: dash-animation 1.2s linear infinite; filter: drop-shadow(0 0 2px rgba(113, 75, 103, 0.3)); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-popup .leaflet-popup-content-wrapper { border-radius: 1rem; border: none; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1); }
+        .custom-popup .leaflet-popup-content { margin: 0; }
+        .custom-popup .leaflet-popup-tip-container { display: none; }
+      `}} />
     </div>
   );
 }
