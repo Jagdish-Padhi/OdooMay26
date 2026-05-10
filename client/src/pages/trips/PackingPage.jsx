@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CheckCircle2, Circle, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { CheckCircle2, Circle, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import Button from '../../components/Button.jsx';
@@ -11,6 +11,7 @@ import ProgressBar from '../../components/ProgressBar.jsx';
 import { FormSkeleton } from '../../components/skeletons/FormSkeleton.jsx';
 import { checklistService } from '../../services/checklist.service.js';
 import { tripsService } from '../../services/trips.service.js';
+import * as aiService from '../../services/ai.service.js';
 
 const CATEGORIES = ['clothing', 'documents', 'electronics', 'toiletries', 'essentials', 'other'];
 
@@ -40,6 +41,7 @@ export default function PackingPage() {
   const [newItem, setNewItem] = useState('');
   const [newCategory, setNewCategory] = useState('essentials');
   const [filter, setFilter] = useState('all');
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -134,6 +136,27 @@ export default function PackingPage() {
     }
   }
 
+  async function handleGenerateAiPackingList() {
+    if (!tripId) return;
+
+    setGenerating(true);
+    try {
+      const response = await aiService.generatePackingList(tripId);
+      const newItems = response.data || [];
+      
+      if (newItems.length === 0) {
+        toast('Your checklist is already up to date!', { icon: '✨' });
+      } else {
+        setItems((current) => [...current, ...newItems]);
+        toast.success(`Generated ${newItems.length} items for your trip!`);
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to generate packing list.');
+    } finally {
+      setGenerating(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl space-y-6 pb-12">
@@ -164,10 +187,22 @@ export default function PackingPage() {
         title={`${trip.name} Packing Checklist`}
         subtitle="Keep your trip essentials organized and track progress as you pack."
         action={(
-          <Button variant="secondary" onClick={resetChecklist}>
-            <RefreshCw size={16} />
-            Reset
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="primary" 
+              onClick={handleGenerateAiPackingList} 
+              loading={generating}
+              disabled={generating}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 border-none hover:opacity-90"
+            >
+              <Sparkles size={16} />
+              AI Packing List
+            </Button>
+            <Button variant="secondary" onClick={resetChecklist} disabled={generating}>
+              <RefreshCw size={16} />
+              Reset
+            </Button>
+          </div>
         )}
       />
 

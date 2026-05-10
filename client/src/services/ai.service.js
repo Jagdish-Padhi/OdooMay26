@@ -101,3 +101,17 @@ export async function sendTripChatMessage({ tripId, messages, stream = true, onC
     streamed: true,
   };
 }
+
+export async function generatePackingList(tripId) {
+  const response = await fetch(`${API_BASE}/ai/packing-list/${tripId}/generate`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: buildHeaders('application/json', 'application/json'),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
+
+  return response.json();
+}

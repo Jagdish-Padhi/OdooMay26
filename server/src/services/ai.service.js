@@ -4,6 +4,7 @@ import { asc, eq } from 'drizzle-orm';
 import { getDb } from '../db/index.js';
 import { aiChatMessages, aiChats } from '../db/schema/index.js';
 import { getTripContextById } from './trips.service.js';
+import { checklists } from '../db/schema/index.js';
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
@@ -306,6 +307,108 @@ export async function generateActivityIdeas({ city, country, type, budget, durat
     console.error('AI Activity Search Error:', error);
     return mockActivityIdeas({ city, type, budget, duration, limit });
   }
+}
+
+export async function generatePackingListSuggestions({ tripId, userId = null }) {
+  const trip = await getTripContextById(tripId, userId);
+  if (!trip) {
+    const error = new Error('Trip not found.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (!genAI) {
+    return mockPackingList(trip);
+  }
+
+  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
+  const prompt = `
+    You are a travel packing expert. Generate a comprehensive packing list for the following trip:
+    Trip Name: ${trip.name}
+    Dates: ${formatDate(trip.startDate)} -> ${formatDate(trip.endDate)}
+    Description: ${trip.description || 'N/A'}
+    Destinations & Activities:
+    ${(trip.stops || []).map(stop => `- ${stop.city?.name}: ${(stop.activities || []).map(a => a.name).join(', ')}`).join('\n')}
+
+    Return ONLY JSON in this exact structure:
+    {
+      "items": [
+        { "item": "Item Name", "category": "clothing|documents|electronics|toiletries|essentials|other" }
+      ]
+    }
+
+    Rules:
+    1. Be specific to the destination, season (based on dates), and activities.
+    2. Suggest approximately 10-20 essential items.
+    3. Categories must strictly be one of: clothing, documents, electronics, toiletries, essentials, other.
+    4. No markdown, no code fences.
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Invalid AI response format');
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    return Array.isArray(parsed.items) ? parsed.items : [];
+  } catch (error) {
+    console.error('AI Packing List Error:', error);
+    return mockPackingList(trip);
+  }
+}
+
+export async function generateAndPersistPackingList({ tripId, userId }) {
+  const db = getDb();
+  
+  // 1. Generate suggestions
+  const suggestions = await generatePackingListSuggestions({ tripId, userId });
+  
+  // 2. Get existing items to avoid duplicates
+  const existingItems = await db
+    .select({ item: checklists.item })
+    .from(checklists)
+    .where(eq(checklists.tripId, tripId));
+  
+  const existingNames = new Set(existingItems.map(i => i.item.toLowerCase()));
+  
+  // 3. Filter out duplicates
+  const newItems = suggestions.filter(s => !existingNames.has(s.item.toLowerCase()));
+  
+  if (newItems.length === 0) {
+    return [];
+  }
+  
+  // 4. Persist to DB
+  const inserted = await db
+    .insert(checklists)
+    .values(newItems.map(item => ({
+      tripId,
+      item: item.item,
+      category: item.category,
+      isPacked: false,
+    })))
+    .returning();
+    
+  return inserted;
+}
+
+function mockPackingList(trip) {
+  return [
+    { item: 'Passport & Travel Documents', category: 'documents' },
+    { item: 'Travel Insurance', category: 'documents' },
+    { item: 'Comfortable Walking Shoes', category: 'clothing' },
+    { item: 'Weather-appropriate clothing', category: 'clothing' },
+    { item: 'Phone Charger & Power Bank', category: 'electronics' },
+    { item: 'Universal Travel Adapter', category: 'electronics' },
+    { item: 'Toiletry Kit (Toothbrush, Paste, etc.)', category: 'toiletries' },
+    { item: 'Personal Medications', category: 'essentials' },
+    { item: 'Reusable Water Bottle', category: 'essentials' },
+    { item: 'Sunscreen & Sunglasses', category: 'essentials' },
+  ];
 }
 
 function mockItinerary(city, country, duration) {
