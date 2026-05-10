@@ -62,7 +62,7 @@ export default function AiPlannerPage() {
                 value={formData.city}
                 onChange={(e) => setFormData({...formData, city: e.target.value})}
                 required
-                icon={<MapPin size={18} />}
+                icon={MapPin}
               />
 
               <div className="space-y-2">
