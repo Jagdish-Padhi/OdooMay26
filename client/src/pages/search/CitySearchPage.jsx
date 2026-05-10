@@ -7,6 +7,7 @@ import Card from '../../components/Card.jsx';
 import Input from '../../components/Input.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
 import { TripCardSkeleton } from '../../components/skeletons/TripCardSkeleton.jsx';
+import { NoCityResultsState } from '../../components/EmptyStates.jsx';
 import { citiesService } from '../../services/cities.service.js';
 
 const COST_LABELS = {
@@ -95,11 +96,7 @@ export default function CitySearchPage() {
           {[...Array(6)].map((_, i) => <TripCardSkeleton key={i} />)}
         </div>
       ) : cities.length === 0 ? (
-        <Card className="p-10 text-center">
-          <MapPinned size={30} className="mx-auto text-(--app-color-text-muted)" />
-          <h2 className="mt-4 text-lg font-bold text-(--app-color-text)">No matching cities</h2>
-          <p className="mt-2 text-sm text-(--app-color-text-muted)">Try a broader search term or clear the cost filter.</p>
-        </Card>
+        <NoCityResultsState query={searchQuery} />
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {cities.map((city) => (

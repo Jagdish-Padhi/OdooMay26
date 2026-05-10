@@ -16,6 +16,7 @@ import Card from '../../components/Card.jsx';
 import Button from '../../components/Button.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
 import { StopSkeleton } from '../../components/skeletons/StopSkeleton.jsx';
+import { NoStopsEmptyState } from '../../components/EmptyStates.jsx';
 import { tripsService } from '../../services/trips.service.js';
 import { stopsService } from '../../services/stops.service.js';
 import { activitiesService } from '../../services/activities.service.js';
@@ -315,14 +316,7 @@ export default function ItineraryViewPage() {
 
       {/* Stops */}
       {stops.length === 0 ? (
-        <Card className="p-12 text-center">
-          <MapPin className="mx-auto mb-4 text-(--app-color-primary)" size={40} />
-          <p className="text-lg font-bold text-(--app-color-text)">No stops planned yet</p>
-          <p className="mt-2 text-sm text-(--app-color-text-muted)">Head to the builder to start adding cities and activities.</p>
-          <Link to={`/trips/${tripId}/builder`} className="mt-6 inline-block">
-            <Button>Open Builder</Button>
-          </Link>
-        </Card>
+        <NoStopsEmptyState tripId={tripId} />
       ) : viewMode === 'timeline' ? (
         <div className="space-y-10">
           {stops.map((stop, i) => (

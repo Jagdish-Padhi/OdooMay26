@@ -9,6 +9,7 @@ import Input from '../../components/Input.jsx';
 import Modal from '../../components/Modal.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
 import { FormSkeleton } from '../../components/skeletons/FormSkeleton.jsx';
+import { EmptyNotesState } from '../../components/EmptyStates.jsx';
 import { notesService } from '../../services/notes.service.js';
 import { stopsService } from '../../services/stops.service.js';
 import { tripsService } from '../../services/trips.service.js';
@@ -226,13 +227,7 @@ export default function NotesPage() {
           );
         })}
 
-        {filteredNotes.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center py-20 text-center opacity-40">
-            <MapPin size={56} strokeWidth={1} />
-            <p className="mt-4 text-lg font-bold">No notes found</p>
-            <p className="text-sm">Capture your travel thoughts by creating a new note.</p>
-          </div>
-        )}
+        {filteredNotes.length === 0 && <EmptyNotesState />}
       </div>
 
       <Modal

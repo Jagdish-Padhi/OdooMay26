@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import api from '../../services/api.js';
 import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
+import { NoStopsEmptyState } from '../../components/EmptyStates.jsx';
 import useAuthStore from '../../store/auth.store.js';
 import { tripsService } from '../../services/trips.service.js';
 import { socialShare } from '../../utils/social.js';
@@ -249,10 +250,7 @@ export default function SharedTripPage() {
 
         {/* Stops */}
         {stops.length === 0 ? (
-          <Card className="py-16 text-center">
-            <MapPin className="mx-auto mb-3 text-slate-300" size={40} />
-            <p className="text-lg font-bold text-slate-700">No stops in this itinerary.</p>
-          </Card>
+          <NoStopsEmptyState tripId={tripId} />
         ) : (
           <div className="space-y-8">
             {stops.map((stop, i) => (
