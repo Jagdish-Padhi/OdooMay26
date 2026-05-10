@@ -17,6 +17,7 @@ import PackingPage from '../pages/trips/PackingPage.jsx';
 import NotesPage from '../pages/trips/NotesPage.jsx';
 import BudgetPage from '../pages/trips/BudgetPage.jsx';
 import SharedTripPage from '../pages/trips/SharedTripPage.jsx';
+import ItineraryBuilderPage from '../pages/trips/ItineraryBuilderPage.jsx';
 import AiPlannerPage from '../pages/dashboard/AiPlannerPage.jsx';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage.jsx';
 
@@ -66,6 +67,7 @@ export default function AppRoutes() {
             <Route path="/dashboard/profile" element={<ProfilePage />} />
             <Route path="/trips" element={<MyTripsPage />} />
             <Route path="/trips/new" element={<CreateTripPage />} />
+            <Route path="/trips/:tripId/builder" element={<ItineraryBuilderPage />} />
             <Route path="/discover" element={<CitySearchPage />} />
             <Route path="/dashboard/packing" element={<PackingPage />} />
             <Route path="/dashboard/notes" element={<NotesPage />} />

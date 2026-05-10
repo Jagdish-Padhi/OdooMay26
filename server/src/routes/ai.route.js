@@ -27,4 +27,27 @@ router.post('/plan', async (req, res, next) => {
   }
 });
 
+router.post('/activity-search', async (req, res, next) => {
+  try {
+    const { city, country, type, budget, duration, limit } = req.body;
+
+    if (!city) {
+      return res.status(400).json({ success: false, message: 'City is required.' });
+    }
+
+    const activities = await aiService.generateActivityIdeas({
+      city,
+      country: country || '',
+      type: type || '',
+      budget: budget || 'medium',
+      duration: duration || '',
+      limit: Number(limit) || 6,
+    });
+
+    return res.status(200).json({ success: true, data: activities });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 export default router;

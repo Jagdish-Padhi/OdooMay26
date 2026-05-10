@@ -130,7 +130,7 @@ export default function CreateTripPage() {
 
       const trip = tripId ? await updateTrip(tripId, payload) : await createTrip(payload);
       toast.success(tripId ? 'Trip updated.' : 'Trip created.');
-      navigate('/trips');
+      navigate(`/trips/${trip.id}/builder`);
       return trip;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to save trip.');
