@@ -10,7 +10,7 @@
  */
 import { useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Compass, LayoutDashboard, LogOut, MapPinned, PlusCircle, User as UserIcon, CheckSquare, FileText, DollarSign, Sparkles, BarChart3 } from 'lucide-react';
+import { Compass, LayoutDashboard, LogOut, MapPinned, PlusCircle, User as UserIcon, CheckSquare, FileText, DollarSign, Sparkles, BarChart3, Archive } from 'lucide-react';
 
 import toast from 'react-hot-toast';
 
@@ -27,9 +27,9 @@ const navigationItems = [
   { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
   { label: 'AI Assistant', path: '/dashboard/ai-planner', icon: Sparkles },
   { label: 'Budget', path: '/dashboard/budget', icon: DollarSign },
+  { label: 'Reports Gallery', path: '/dashboard/reports', icon: Archive },
   { label: 'Packing List', path: '/dashboard/packing', icon: CheckSquare },
   { label: 'Trip Notes', path: '/dashboard/notes', icon: FileText },
-  { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
   { label: 'Admin', path: '/dashboard/admin', icon: BarChart3 },
 ];
 

@@ -12,8 +12,8 @@ import useTripsStore from '../../store/trips.store.js';
 function TripForm({ trip, destination, saving, onSubmit }) {
   const [form, setForm] = useState(() => ({
     name: trip?.name || (destination ? `Trip to ${destination}` : ''),
-    startDate: trip?.startDate ? String(trip.startDate).slice(0, 10) : '',
-    endDate: trip?.endDate ? String(trip.endDate).slice(0, 10) : '',
+    startDate: (trip?.startDate && !isNaN(new Date(trip.startDate).getTime())) ? new Date(trip.startDate).toISOString().split('T')[0] : '',
+    endDate: (trip?.endDate && !isNaN(new Date(trip.endDate).getTime())) ? new Date(trip.endDate).toISOString().split('T')[0] : '',
     description: trip?.description || '',
     coverPhoto: trip?.coverPhoto || '',
   }));
@@ -107,6 +107,17 @@ export default function CreateTripPage() {
     fetchTrip(tripId);
   }, [tripId, fetchTrip, clearCurrentTrip]);
 
+  const toIso = (val) => {
+    if (!val) return null;
+    try {
+      const d = new Date(val);
+      return (d instanceof Date && !isNaN(d.getTime())) ? d.toISOString() : null;
+    } catch (e) {
+      console.error('Date conversion error:', e);
+      return null;
+    }
+  };
+
   const handleSubmit = async (form) => {
     if (form === 'cancel') {
       navigate('/trips');
@@ -122,8 +133,8 @@ export default function CreateTripPage() {
     try {
       const payload = {
         name: form.name.trim(),
-        startDate: new Date(form.startDate).toISOString(),
-        endDate: new Date(form.endDate).toISOString(),
+        startDate: toIso(form.startDate),
+        endDate: toIso(form.endDate),
         description: form.description.trim() || null,
         coverPhoto: form.coverPhoto.trim() || null,
       };

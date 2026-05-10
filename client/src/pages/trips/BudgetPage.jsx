@@ -15,11 +15,11 @@ import PageHeader from '../../components/PageHeader';
 import Card from '../../components/Card';
 import ProgressBar from '../../components/ProgressBar';
 import Button from '../../components/Button';
+import useDownloadStore from '../../store/download.store.js';
 
 export default function BudgetPage() {
   const [budgetData, setBudgetData] = useState(null);
-
-  // Mock data for demo
+  const startDownload = useDownloadStore(s => s.startDownload);
   useEffect(() => {
     setBudgetData({
       total: 3450.00,
@@ -145,7 +145,11 @@ export default function BudgetPage() {
           <Card className="bg-gradient-to-br from-(--app-color-primary) to-(--app-color-accent) p-8 text-white">
             <h4 className="mb-2 text-lg font-bold">Ready to travel?</h4>
             <p className="mb-6 text-sm text-white/80">Export this budget as a CSV or PDF for your travel group.</p>
-            <Button variant="tertiary" className="w-full bg-white/10 text-white hover:bg-white/20">
+            <Button 
+              variant="tertiary" 
+              className="w-full bg-white/10 text-white hover:bg-white/20"
+              onClick={() => startDownload('Full Budget Report')}
+            >
               Download Report
             </Button>
           </Card>

@@ -19,6 +19,7 @@ import BudgetPage from '../pages/trips/BudgetPage.jsx';
 import SharedTripPage from '../pages/trips/SharedTripPage.jsx';
 import AiPlannerPage from '../pages/dashboard/AiPlannerPage.jsx';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage.jsx';
+import ReportsPage from '../pages/dashboard/ReportsPage.jsx';
 
 import useAuthStore from '../store/auth.store.js';
 
@@ -72,6 +73,7 @@ export default function AppRoutes() {
             <Route path="/dashboard/budget" element={<BudgetPage />} />
             <Route path="/dashboard/ai-planner" element={<AiPlannerPage />} />
             <Route path="/dashboard/admin" element={<AdminDashboardPage />} />
+            <Route path="/dashboard/reports" element={<ReportsPage />} />
           </Route>
         </Route>
 

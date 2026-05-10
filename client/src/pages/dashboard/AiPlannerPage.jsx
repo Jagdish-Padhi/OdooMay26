@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Sparkles, 
   Send, 
@@ -16,8 +17,12 @@ import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import api from '../../services/api.js';
+import useTripsStore from '../../store/trips.store.js';
 
 export default function AiPlannerPage() {
+  const navigate = useNavigate();
+  const createTrip = useTripsStore(s => s.createTrip);
+  
   const [formData, setFormData] = useState({
     city: '',
     duration: '3',
@@ -25,6 +30,7 @@ export default function AiPlannerPage() {
     preferences: ''
   });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [result, setResult] = useState(null);
 
   const handleGenerate = async (e) => {
@@ -40,6 +46,29 @@ export default function AiPlannerPage() {
       toast.error('AI is currently busy. Try again in a moment.');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleSaveTrip = async () => {
+    if (!result) return;
+    setIsSaving(true);
+    try {
+      // Convert AI result to Trip Schema
+      const payload = {
+        name: result.name,
+        description: result.description,
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 86400000 * parseInt(formData.duration)).toISOString(),
+        isPublic: false
+      };
+      
+      await createTrip(payload);
+      toast.success('AI Itinerary saved to your trips!');
+      navigate('/trips');
+    } catch (err) {
+      toast.error('Failed to save AI itinerary.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -197,7 +226,11 @@ export default function AiPlannerPage() {
               </div>
 
               <div className="flex justify-center pt-8">
-                <Button className="h-14 px-10 rounded-2xl shadow-xl hover:scale-105 active:scale-95">
+                <Button 
+                  onClick={handleSaveTrip} 
+                  loading={isSaving}
+                  className="h-14 px-10 rounded-2xl shadow-xl hover:scale-105 active:scale-95"
+                >
                   Save Itinerary to My Trips
                   <ArrowRight size={20} />
                 </Button>
