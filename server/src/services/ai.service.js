@@ -8,7 +8,7 @@ import { getTripContextById } from './trips.service.js';
 const API_KEY = process.env.GEMINI_API_KEY;
 const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
-const MODEL_NAME = "gemini-1.5-flash";
+const MODEL_NAME = "gemini-2.0-flash";
 
 function formatDate(value) {
   if (!value) return 'Unknown';
@@ -98,7 +98,8 @@ async function* chunkText(text) {
   const chunkSize = 36;
 
   for (let index = 0; index < text.length; index += chunkSize) {
-    yield text.slice(index, index + chunkSize);
+    const slice = text.slice(index, index + chunkSize);
+    yield { text: () => slice };
   }
 }
 
@@ -161,6 +162,7 @@ export async function generateTripChatReply({ tripId, userId = null, messages = 
       chatId: chat.id,
       trip,
       reply,
+      isLive: false,
       stream: stream ? chunkText(reply) : undefined,
       replyPromise: Promise.resolve(reply),
       priorMessages,
@@ -168,40 +170,59 @@ export async function generateTripChatReply({ tripId, userId = null, messages = 
     };
   }
 
-  const model = genAI.getGenerativeModel({
-    model: MODEL_NAME,
-    systemInstruction: buildTripContextPrompt(trip),
-  });
+  try {
+    const model = genAI.getGenerativeModel({
+      model: MODEL_NAME,
+      systemInstruction: buildTripContextPrompt(trip),
+    });
 
-  const chatSession = model.startChat({
-    history: toGeminiHistory(priorMessages),
-  });
+    const chatSession = model.startChat({
+      history: toGeminiHistory(priorMessages),
+    });
 
-  if (!stream) {
-    const result = await chatSession.sendMessage(lastMessage.content);
-    const reply = result.response.text();
+    if (!stream) {
+      const result = await chatSession.sendMessage(lastMessage.content);
+      const reply = result.response.text();
+
+      return {
+        mode: 'json',
+        chatId: chat.id,
+        trip,
+        reply,
+        isLive: true,
+        priorMessages,
+        userMessage: lastMessage.content,
+      };
+    }
+
+    const result = await chatSession.sendMessageStream(lastMessage.content);
 
     return {
-      mode: 'json',
+      mode: 'stream',
+      chatId: chat.id,
+      trip,
+      isLive: true,
+      stream: result.stream,
+      replyPromise: result.response.then((response) => response.text()),
+      priorMessages,
+      userMessage: lastMessage.content,
+    };
+  } catch (apiError) {
+    console.warn('Gemini API error, falling back to mock:', apiError.message);
+    const reply = createMockReply(trip, lastMessage.content);
+
+    return {
+      mode: stream ? 'stream' : 'json',
       chatId: chat.id,
       trip,
       reply,
+      isLive: false,
+      stream: stream ? chunkText(reply) : undefined,
+      replyPromise: Promise.resolve(reply),
       priorMessages,
       userMessage: lastMessage.content,
     };
   }
-
-  const result = await chatSession.sendMessageStream(lastMessage.content);
-
-  return {
-    mode: 'stream',
-    chatId: chat.id,
-    trip,
-    stream: result.stream,
-    replyPromise: result.response.then((response) => response.text()),
-    priorMessages,
-    userMessage: lastMessage.content,
-  };
 }
 
 export async function persistTripChatTurn({ chatId, userMessage, assistantMessage }) {

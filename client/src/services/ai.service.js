@@ -64,13 +64,17 @@ export async function sendTripChatMessage({ tripId, messages, stream = true, onC
     const payload = await response.json();
     return {
       reply: payload.data?.reply || '',
+      isLive: !!payload.data?.isLive,
       streamed: false,
     };
   }
 
+  const isLive = response.headers.get('x-ai-live') === '1';
+
   if (!response.body) {
     return {
       reply: await response.text(),
+      isLive,
       streamed: false,
     };
   }
@@ -98,6 +102,7 @@ export async function sendTripChatMessage({ tripId, messages, stream = true, onC
 
   return {
     reply,
+    isLive,
     streamed: true,
   };
 }
