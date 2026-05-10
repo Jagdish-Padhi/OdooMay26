@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import Card from '../../components/Card.jsx';
 import Button from '../../components/Button.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
+import AiConciergeChat from '../../components/AiConciergeChat.jsx';
 import { StopSkeleton } from '../../components/skeletons/StopSkeleton.jsx';
 import { NoStopsEmptyState } from '../../components/EmptyStates.jsx';
 import { tripsService } from '../../services/trips.service.js';
@@ -231,6 +232,7 @@ export default function ItineraryViewPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 pb-16">
+      <AiConciergeChat tripId={tripId} tripName={trip.name} />
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">

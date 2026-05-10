@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import api from '../../services/api.js';
 import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
+import AiConciergeChat from '../../components/AiConciergeChat.jsx';
 import { NoStopsEmptyState } from '../../components/EmptyStates.jsx';
 import useAuthStore from '../../store/auth.store.js';
 import { tripsService } from '../../services/trips.service.js';
@@ -180,6 +181,7 @@ export default function SharedTripPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <AiConciergeChat tripId={id} tripName={trip.name} />
       {/* Hero Banner */}
       <div className="relative overflow-hidden bg-linear-to-br from-indigo-600 to-purple-700 px-6 py-16 text-white">
         <div className="mx-auto max-w-4xl">
