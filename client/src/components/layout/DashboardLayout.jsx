@@ -110,7 +110,7 @@ export default function DashboardLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
-  const isBuilder = location.pathname.includes('/builder');
+  const isFlushMode = location.pathname.includes('/builder') || location.pathname.includes('/ai-planner');
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -148,9 +148,9 @@ export default function DashboardLayout() {
         </div>
       )}
 
-      <main className={`min-w-0 flex-1 transition-all duration-300 ${isBuilder ? 'bg-white' : ''}`}>
+      <main className={`min-w-0 flex-1 transition-all duration-300 ${isFlushMode ? 'bg-white' : ''}`}>
         <div className="h-14 lg:hidden" />
-        <div className={isBuilder ? 'h-full w-full' : 'px-4 py-6 sm:px-6 lg:px-8 lg:py-8 mx-auto max-w-7xl'}>
+        <div className={isFlushMode ? 'h-full w-full' : 'px-4 py-6 sm:px-6 lg:px-8 lg:py-8 mx-auto max-w-7xl'}>
           <Outlet />
         </div>
       </main>
