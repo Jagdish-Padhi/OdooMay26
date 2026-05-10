@@ -10,7 +10,7 @@
  */
 import { useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, LogOut, User as UserIcon } from 'lucide-react';
+import { Compass, LayoutDashboard, LogOut, MapPinned, PlusCircle, User as UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import api from '../../services/api.js';
@@ -20,6 +20,9 @@ import useAuthStore from '../../store/auth.store.js';
 // icon: any lucide-react icon component
 const navigationItems = [
   { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'My Trips', path: '/trips', icon: MapPinned },
+  { label: 'New Trip', path: '/trips/new', icon: PlusCircle },
+  { label: 'Discover', path: '/discover', icon: Compass },
   { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
 ];
 
