@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 import api from '../../services/api.js';
 import useAuthStore from '../../store/auth.store.js';
 
-const navigationItems = [
+const userNavigationItems = [
   { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
   { label: 'My Trips', path: '/trips', icon: MapPinned },
   { label: 'AI Planner', path: '/dashboard/ai-planner', icon: Sparkles },
@@ -20,7 +20,11 @@ const navigationItems = [
   { label: 'Trip Notes', path: '/dashboard/notes', icon: FileText },
   { label: 'Discover', path: '/discover', icon: Compass },
   { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
+];
+
+const adminNavigationItems = [
   { label: 'Admin Control', path: '/dashboard/admin', icon: BarChart3 },
+  { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
 ];
 
 function SidebarContent({ onNavigate, isCollapsed, onToggle }) {
@@ -36,12 +40,7 @@ function SidebarContent({ onNavigate, isCollapsed, onToggle }) {
     navigate('/login');
   };
 
-  const filteredNavigation = navigationItems.filter(item => {
-    if (item.path === '/dashboard/admin') {
-      return user?.role === 'admin';
-    }
-    return true;
-  });
+  const currentNavigation = user?.role === 'admin' ? adminNavigationItems : userNavigationItems;
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -64,25 +63,22 @@ function SidebarContent({ onNavigate, isCollapsed, onToggle }) {
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-4 scrollbar-hide">
-        {filteredNavigation.map(({ label, path, icon: Icon }) => {
-          const active = location.pathname === path;
-          return (
-            <Link
-              key={path}
-              to={path}
-              onClick={onNavigate}
-              title={isCollapsed ? label : ''}
-              className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
-                active
-                  ? 'bg-(--app-color-primary-soft) text-(--app-color-primary)'
-                  : 'text-(--app-color-text-muted) hover:bg-(--app-color-surface-elevated) hover:text-(--app-color-text)'
-              } ${isCollapsed ? 'justify-center' : ''}`}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              {!isCollapsed && <span>{label}</span>}
-            </Link>
-          );
-        })}
+        {currentNavigation.map(({ label, path, icon: Icon }) => (
+          <Link
+            key={path}
+            to={path}
+            onClick={onNavigate}
+            title={isCollapsed ? label : ''}
+            className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+              location.pathname === path
+                ? 'bg-(--app-color-primary-soft) text-(--app-color-primary)'
+                : 'text-(--app-color-text-muted) hover:bg-(--app-color-surface-elevated) hover:text-(--app-color-text)'
+            } ${isCollapsed ? 'justify-center' : ''}`}
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            {!isCollapsed && <span>{label}</span>}
+          </Link>
+        ))}
       </nav>
 
       <div className={`border-t border-(--app-color-border) p-4 ${isCollapsed ? 'flex justify-center' : ''}`}>

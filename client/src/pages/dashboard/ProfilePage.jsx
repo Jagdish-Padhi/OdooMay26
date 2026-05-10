@@ -160,7 +160,9 @@ export default function ProfilePage() {
                   {user?.name?.[0]}
                 </div>
                 <h4 className="font-bold">{user?.name}</h4>
-                <p className="text-xs text-white/70">{user?.plan?.toUpperCase()} PLAN</p>
+                <p className="text-xs text-white/70">
+                  {user?.role === 'admin' ? 'SYSTEM ADMIN' : `${user?.plan?.toUpperCase()} PLAN`}
+                </p>
               </div>
               <div className="p-4">
                 <Button 
