@@ -10,7 +10,7 @@
  */
 import { useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, LogOut, Settings } from 'lucide-react';
+import { LayoutDashboard, LogOut, User as UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import api from '../../services/api.js';
@@ -20,9 +20,7 @@ import useAuthStore from '../../store/auth.store.js';
 // icon: any lucide-react icon component
 const navigationItems = [
   { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
-  // { label: 'Resources', path: '/dashboard/resources', icon: Layers },
-  // { label: 'Analytics', path: '/dashboard/analytics', icon: BarChart3 },
-  // Add more items here ↑
+  { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
 ];
 
 export default function DashboardLayout() {
@@ -45,11 +43,12 @@ export default function DashboardLayout() {
       {/* ── Sidebar ── */}
       <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-(--app-color-border) bg-white/90 backdrop-blur">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 px-6 py-5 hover:opacity-80">
-          {/* TODO: Replace logo.png */}
-          <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
-          {/* TODO: Replace app name */}
-          <span className="text-sm font-black uppercase tracking-widest text-(--app-color-text)">App Name</span>
+        <Link to="/" className="flex items-center gap-3 px-6 py-5 group">
+          <img src="/logo.png" alt="TraveLoop" className="h-10 w-10 object-contain transition-transform group-hover:scale-110" />
+          <div className="flex items-baseline gap-0.5">
+            <span className="text-(--app-color-text) text-lg font-black uppercase tracking-tight">Trave</span>
+            <span className="logo-shield text-lg font-black uppercase tracking-tight text-(--app-color-accent)">Loop</span>
+          </div>
         </Link>
 
         {/* Nav items */}

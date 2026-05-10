@@ -118,7 +118,7 @@ export default function LoginPage() {
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-semibold text-(--app-color-text)">Password</label>
-                    <a href="#" className="text-xs font-medium text-(--app-color-primary) hover:underline">Forgot password?</a>
+                    <Link to="/forgot-password" className="text-xs font-medium text-(--app-color-primary) hover:underline">Forgot password?</Link>
                   </div>
                   <Input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="••••••••" className="h-11 rounded-xl" />
                 </div>

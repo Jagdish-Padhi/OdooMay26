@@ -8,6 +8,8 @@ import LandingPage from '../pages/landing/LandingPage.jsx';
 import LoginPage from '../pages/auth/LoginPage.jsx';
 import RegisterPage from '../pages/auth/RegisterPage.jsx';
 import DashboardHomePage from '../pages/dashboard/DashboardHomePage.jsx';
+import ProfilePage from '../pages/dashboard/ProfilePage.jsx';
+import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage.jsx';
 
 import useAuthStore from '../store/auth.store.js';
 
@@ -47,9 +49,11 @@ export default function AppRoutes() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route element={<PrivateRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardHomePage />} />
+            <Route path="/dashboard/profile" element={<ProfilePage />} />
           </Route>
         </Route>
 
