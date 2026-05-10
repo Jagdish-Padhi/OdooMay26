@@ -68,6 +68,9 @@ export default function AppRoutes() {
             <Route path="/trips" element={<MyTripsPage />} />
             <Route path="/trips/new" element={<CreateTripPage />} />
             <Route path="/trips/:tripId/builder" element={<ItineraryBuilderPage />} />
+            <Route path="/trips/:tripId/budget" element={<BudgetPage />} />
+            <Route path="/trips/:tripId/packing" element={<PackingPage />} />
+            <Route path="/trips/:tripId/notes" element={<NotesPage />} />
             <Route path="/discover" element={<CitySearchPage />} />
             <Route path="/dashboard/packing" element={<PackingPage />} />
             <Route path="/dashboard/notes" element={<NotesPage />} />

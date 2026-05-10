@@ -458,6 +458,15 @@ export default function ItineraryBuilderPage() {
               <CalendarViewIcon size={16} />
               Calendar view
             </Button>
+            <Button as={Link} to={`/trips/${tripId}/budget`} variant="secondary">
+              Budget
+            </Button>
+            <Button as={Link} to={`/trips/${tripId}/packing`} variant="secondary">
+              Packing
+            </Button>
+            <Button as={Link} to={`/trips/${tripId}/notes`} variant="secondary">
+              Notes
+            </Button>
           </div>
         )}
       />
