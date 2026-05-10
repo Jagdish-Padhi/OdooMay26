@@ -10,7 +10,7 @@
 
 | 🚀 Live Platform | 🎥 Video Walkthrough | 🎨 UI Mockups |
 |:------------:|:-------------------:|:---------------:|
-| [**Launch App**](https://traveloop.app) | [**Watch Demo**](https://youtu.be/traveloop-demo) | [**View Gallery**](#-ui-showcase) |
+| [**Launch App**](https://traveloop-seven.vercel.app/) | [**Watch Demo**](https://drive.google.com/file/d/15r-YXEm7EBh-PMB1GJkWEzfJ8ml8knue/view) | [**View Gallery**](#-ui-showcase) |
 
 ---
 
