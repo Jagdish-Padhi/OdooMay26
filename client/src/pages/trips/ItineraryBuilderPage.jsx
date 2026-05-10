@@ -24,6 +24,7 @@ import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
 import Input from '../../components/Input.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
+import { StopSkeleton } from '../../components/skeletons/StopSkeleton.jsx';
 import { citiesService } from '../../services/cities.service.js';
 import { tripsService } from '../../services/trips.service.js';
 import { stopsService } from '../../services/stops.service.js';
@@ -433,8 +434,8 @@ export default function ItineraryBuilderPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-(--app-color-primary) border-t-transparent" />
+      <div className="mx-auto max-w-7xl space-y-8 pb-12">
+        <StopSkeleton count={3} />
       </div>
     );
   }

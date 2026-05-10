@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import Card from '../../components/Card.jsx';
 import Button from '../../components/Button.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
+import { StopSkeleton } from '../../components/skeletons/StopSkeleton.jsx';
 import { tripsService } from '../../services/trips.service.js';
 import { stopsService } from '../../services/stops.service.js';
 import { activitiesService } from '../../services/activities.service.js';
@@ -217,8 +218,8 @@ export default function ItineraryViewPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-(--app-color-primary) border-t-transparent" />
+      <div className="mx-auto max-w-4xl space-y-8 pb-16">
+        <StopSkeleton count={3} />
       </div>
     );
   }

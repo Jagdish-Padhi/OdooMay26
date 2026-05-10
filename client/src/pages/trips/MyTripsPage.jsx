@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
 import PageHeader from '../../components/PageHeader.jsx';
+import { TripCardSkeleton } from '../../components/skeletons/TripCardSkeleton.jsx';
 import useTripsStore from '../../store/trips.store.js';
 
 function formatDateRange(startDate, endDate) {
@@ -57,8 +58,8 @@ export default function MyTripsPage() {
       />
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-(--app-color-primary) border-t-transparent" />
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {[...Array(6)].map((_, i) => <TripCardSkeleton key={i} />)}
         </div>
       ) : trips.length === 0 ? (
         <Card className="p-10 text-center">
