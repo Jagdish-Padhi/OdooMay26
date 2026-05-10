@@ -10,7 +10,7 @@
  */
 import { useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, LogOut, User as UserIcon, CheckSquare, FileText, DollarSign } from 'lucide-react';
+import { LayoutDashboard, LogOut, User as UserIcon, CheckSquare, FileText, DollarSign, Sparkles, BarChart3 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import api from '../../services/api.js';
@@ -20,10 +20,12 @@ import useAuthStore from '../../store/auth.store.js';
 // icon: any lucide-react icon component
 const navigationItems = [
   { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
-  { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
+  { label: 'AI Assistant', path: '/dashboard/ai-planner', icon: Sparkles },
   { label: 'Budget', path: '/dashboard/budget', icon: DollarSign },
   { label: 'Packing List', path: '/dashboard/packing', icon: CheckSquare },
   { label: 'Trip Notes', path: '/dashboard/notes', icon: FileText },
+  { label: 'Profile', path: '/dashboard/profile', icon: UserIcon },
+  { label: 'Admin', path: '/dashboard/admin', icon: BarChart3 },
 ];
 
 export default function DashboardLayout() {
