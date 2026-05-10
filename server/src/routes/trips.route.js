@@ -4,6 +4,7 @@ import * as tripsController from '../controllers/trips.controller.js';
 import * as tripService from '../services/trips.service.js';
 import { computeBudget } from '../services/budget.service.js';
 import checklistRoute from './checklist.route.js';
+import stopsRoute from './stops.route.js';
 import notesRoute from './notes.route.js';
 import { verifyToken } from '../middlewares/verifyToken.js';
 
@@ -29,6 +30,7 @@ router.post('/:id/duplicate', async (req, res, next) => {
 router.get('/:id', tripsController.getTrip);
 router.put('/:id', tripsController.updateTrip);
 router.delete('/:id', tripsController.deleteTrip);
+router.use('/:id/stops', stopsRoute);
 
 // Budget computation for a trip
 router.get('/:id/budget', async (req, res, next) => {

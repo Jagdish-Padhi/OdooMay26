@@ -56,6 +56,45 @@ export async function generateAiItinerary({ city, country, duration, budget, pre
   }
 }
 
+export async function generateActivityIdeas({ city, country, type, budget, duration, limit = 6 }) {
+  if (!genAI) {
+    return mockActivityIdeas({ city, type, budget, duration, limit });
+  }
+
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const prompt = `
+    Generate ${limit} travel activity ideas for ${city}, ${country || 'any country'}.
+    Filters:
+    - Type: ${type || 'any'}
+    - Budget: ${budget || 'medium'}
+    - Duration: ${duration || 'any'}
+
+    Return ONLY JSON in this exact structure:
+    {
+      "activities": [
+        { "name": "Activity Name", "type": "sightseeing|food|transport|adventure|relaxation|culture|shopping|other", "cost": number, "duration": "e.g. 2 hours", "notes": "Short tip" }
+      ]
+    }
+
+    Make sure the ideas feel realistic for the destination and match the filters as closely as possible.
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Invalid AI response format');
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    return Array.isArray(parsed.activities) ? parsed.activities.slice(0, limit) : [];
+  } catch (error) {
+    console.error('AI Activity Search Error:', error);
+    return mockActivityIdeas({ city, type, budget, duration, limit });
+  }
+}
+
 function mockItinerary(city, country, duration) {
   return {
     name: `Magic ${city} Escape`,
@@ -72,4 +111,26 @@ function mockItinerary(city, country, duration) {
       }
     ]
   };
+}
+
+function mockActivityIdeas({ city, type, budget, duration, limit }) {
+  const baseIdeas = [
+    { name: `Explore ${city} Old Town`, type: 'sightseeing', cost: 0, duration: '2 hours', notes: 'Best for a morning walk.' },
+    { name: `Local food crawl in ${city}`, type: 'food', cost: 35, duration: '3 hours', notes: 'Try a neighborhood market.' },
+    { name: `${city} scenic viewpoints`, type: 'relaxation', cost: 10, duration: '90 minutes', notes: 'Great at sunset.' },
+    { name: `Museum circuit in ${city}`, type: 'culture', cost: 18, duration: '2 hours', notes: 'Check opening times first.' },
+    { name: `Hidden gems photo walk`, type: 'sightseeing', cost: 0, duration: '2 hours', notes: 'Bring comfortable shoes.' },
+    { name: `Night market tasting`, type: 'food', cost: 22, duration: '2 hours', notes: 'Perfect for budget travelers.' },
+    { name: `Boat or tram ride`, type: 'transport', cost: 12, duration: '1 hour', notes: 'Easy way to see the city.' },
+    { name: `Relaxed park afternoon`, type: 'relaxation', cost: 0, duration: '2 hours', notes: 'Good buffer activity.' },
+  ];
+
+  const costFilter = budget === 'low' ? 20 : budget === 'medium' ? 60 : Infinity;
+  const durationFilter = String(duration || '').toLowerCase();
+
+  return baseIdeas
+    .filter((idea) => !type || type === 'any' || idea.type === type)
+    .filter((idea) => idea.cost <= costFilter)
+    .filter((idea) => !durationFilter || durationFilter === 'any' || idea.duration.toLowerCase().includes(durationFilter) || durationFilter.includes('any'))
+    .slice(0, limit);
 }
