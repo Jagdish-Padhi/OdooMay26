@@ -143,7 +143,7 @@ export default function RegisterPage() {
                   error={errors.name}
                   required 
                   placeholder="e.g. Acme Corp" 
-                  className="h-10 rounded-xl text-sm" 
+                  inputClassName="h-11 rounded-xl text-sm" 
                 />
                 <Input 
                   label="Email" 
@@ -154,7 +154,7 @@ export default function RegisterPage() {
                   error={errors.email}
                   required 
                   placeholder="you@example.com" 
-                  className="h-10 rounded-xl text-sm" 
+                  inputClassName="h-11 rounded-xl text-sm" 
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <Input 
@@ -166,7 +166,7 @@ export default function RegisterPage() {
                     error={errors.password}
                     required 
                     placeholder="••••••••" 
-                    className="h-10 rounded-xl text-sm" 
+                    inputClassName="h-11 rounded-xl text-sm" 
                   />
                   <Input 
                     label="Confirm" 
@@ -177,12 +177,12 @@ export default function RegisterPage() {
                     error={errors.confirmPassword}
                     required 
                     placeholder="••••••••" 
-                    className="h-10 rounded-xl text-sm" 
+                    inputClassName="h-11 rounded-xl text-sm" 
                   />
                 </div>
                 <div className="pt-1">
                   {/* TODO: Replace button label */}
-                  <Button type="submit" className="h-10 w-full rounded-xl text-xs font-bold shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99]" loading={isSubmitting} disabled={isSubmitting}>
+                  <Button type="submit" className="h-11 w-full rounded-xl text-sm font-bold shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99]" loading={isSubmitting} disabled={isSubmitting}>
                     Create Account
                   </Button>
                 </div>

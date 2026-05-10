@@ -8,6 +8,7 @@ const Input = forwardRef(function Input(
     helperText,
     icon: Icon,
     className = '',
+    inputClassName = '',
     id,
     required,
     ...rest
@@ -50,6 +51,7 @@ const Input = forwardRef(function Input(
             hasError
               ? 'border-red-400 focus:border-red-400 focus:ring-red-100'
               : 'border-(--app-color-border) focus:border-(--app-color-primary) focus:ring-(--app-color-primary)/10',
+            inputClassName,
           ]
             .filter(Boolean)
             .join(' ')}

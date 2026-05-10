@@ -20,7 +20,10 @@ import {
   ArrowRight,
   Shield,
   Zap,
-  Globe
+  Globe,
+  BellRing,
+  Copy,
+  Check
 } from 'lucide-react';
 
 const FEATURES = [
@@ -64,8 +67,7 @@ export default function LandingPage() {
         <div className="grid w-full items-center gap-10 lg:grid-cols-[1fr_1.1fr]">
           {/* Left: Content */}
           <div className="text-left py-10 lg:py-0">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-(--app-color-border) bg-white/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-(--app-color-primary) backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-(--app-color-primary)" />
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border-none bg-(--app-color-primary) px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white backdrop-blur shadow-lg">
               The Ultimate Travel Planner
             </div>
 
@@ -136,13 +138,131 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Intuitive by Design Bento Section ── */}
+      <section className="relative z-10 mx-auto max-w-7xl px-6 py-24">
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-4xl font-black tracking-tight text-(--app-color-text) lg:text-5xl">
+            Intuitive by Design
+          </h2>
+          <p className="mx-auto max-w-xl text-(--app-color-text-muted)">
+            Every tool within TraveLoop is crafted for speed, precision, and aesthetic pleasure.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[700px]">
+          {/* Column 1: Automated Budgeting */}
+          <div className="md:col-span-5 rounded-[2.5rem] border border-(--app-color-border)/50 bg-white p-10 flex flex-col justify-between overflow-hidden relative group hover:shadow-2xl transition-all">
+            <div className="space-y-4">
+              <div className="h-14 w-14 rounded-2xl bg-(--app-color-primary-soft) flex items-center justify-center text-(--app-color-primary)">
+                <Wallet size={32} />
+              </div>
+              <h3 className="text-2xl font-black text-(--app-color-text)">Automated Budgeting</h3>
+              <p className="text-(--app-color-text-muted)">Real-time cost breakdowns for every aspect of your journey.</p>
+            </div>
+            
+            <div className="mt-12 space-y-6">
+              <div className="flex items-end gap-3 h-48">
+                <div className="flex-1 bg-(--app-color-primary)/20 rounded-t-xl h-[40%] hover:bg-(--app-color-primary) transition-all cursor-pointer" />
+                <div className="flex-1 bg-(--app-color-primary)/40 rounded-t-xl h-[85%] hover:bg-(--app-color-primary) transition-all cursor-pointer" />
+                <div className="flex-1 bg-(--app-color-primary)/10 rounded-t-xl h-[25%] hover:bg-(--app-color-primary) transition-all cursor-pointer" />
+                <div className="flex-1 bg-(--app-color-primary)/60 rounded-t-xl h-[60%] hover:bg-(--app-color-primary) transition-all cursor-pointer" />
+              </div>
+              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-(--app-color-text-muted) pt-2">
+                <span>Transport</span>
+                <span>Stay</span>
+                <span>Dining</span>
+                <span>Misc</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 2 Center */}
+          <div className="md:col-span-4 flex flex-col gap-6">
+            {/* Dynamic City Discovery */}
+            <div className="flex-1 rounded-[2.5rem] overflow-hidden relative group">
+              <img 
+                src="/images/paris_destination.jpg" 
+                alt="Paris" 
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-(--app-color-primary)/80 to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
+                <div>
+                  <h4 className="text-white text-xl font-bold">Paris, FR</h4>
+                  <p className="text-white/70 text-[10px] font-bold uppercase tracking-widest">Luxury Destination</p>
+                </div>
+                <span className="bg-white/20 backdrop-blur-md border border-white/30 text-white px-3 py-1 rounded-full text-[10px] font-bold">$$$</span>
+              </div>
+            </div>
+            
+            {/* Collaborative Itineraries */}
+            <div className="flex-1 rounded-[2.5rem] border border-(--app-color-border)/50 bg-white p-8 flex flex-col justify-between group hover:shadow-xl transition-all">
+              <div className="space-y-2">
+                <h4 className="text-xl font-black text-(--app-color-text)">Public View</h4>
+                <p className="text-sm text-(--app-color-text-muted)">Share your plans with clients or friends effortlessly.</p>
+              </div>
+              <div className="flex items-center gap-2 mt-4">
+                <div className="flex-1 bg-slate-50 border border-(--app-color-border) px-4 py-2.5 rounded-xl text-xs truncate text-(--app-color-text-muted)">
+                  traveloop.com/itinerary/luxury-alps
+                </div>
+                <button className="p-2.5 border border-(--app-color-primary) text-(--app-color-primary) rounded-xl hover:bg-(--app-color-primary) hover:!text-white transition-colors">
+                  <Copy size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 3: Premium Tools */}
+          <div className="md:col-span-3 rounded-[2.5rem] border border-(--app-color-border)/50 bg-white p-8 flex flex-col gap-8 hover:shadow-xl transition-all">
+            <h3 className="text-xl font-black text-(--app-color-text)">Planning Tools</h3>
+            
+            {/* Budget Alert Widget */}
+            <div className="bg-red-50 p-5 rounded-3xl border border-red-100 space-y-3">
+              <div className="flex justify-between items-start">
+                <BellRing className="text-red-500" size={20} />
+                <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Alert</span>
+              </div>
+              <p className="text-sm font-bold text-red-900">Budget Over: Transport</p>
+              <p className="text-[10px] text-red-700 leading-relaxed">Flight costs to London exceed limit by $240.</p>
+              <div className="h-1.5 w-full bg-red-200 rounded-full overflow-hidden">
+                <div className="h-full bg-red-500 w-full" />
+              </div>
+            </div>
+
+            {/* Checklist Widget */}
+            <div className="flex-1 flex flex-col">
+              <p className="text-[10px] font-bold text-(--app-color-text-muted) mb-4 uppercase tracking-widest">Packing List</p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                    <Check size={12} strokeWidth={3} />
+                  </div>
+                  <span className="text-sm text-(--app-color-text-muted) line-through">Passport & Visa</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full border-2 border-(--app-color-border)" />
+                  <span className="text-sm text-(--app-color-text)">Digital Itinerary</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full border-2 border-(--app-color-border)" />
+                  <span className="text-sm text-(--app-color-text)">Luxury Watch Set</span>
+                </div>
+              </div>
+              <button className="mt-auto w-full py-3 border border-(--app-color-border) rounded-2xl text-[10px] font-bold uppercase tracking-widest text-(--app-color-primary) hover:bg-(--app-color-primary-soft) transition-all">
+                Manage Widgets
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Bottom CTA ── */}
       <section className="relative z-10 py-16 text-center">
         {/* TODO: Replace CTA text */}
         <h2 className="mb-4 text-3xl font-black text-(--app-color-text)">Ready for your next trip?</h2>
         <p className="mb-8 text-(--app-color-text-muted)">Join Traveloop today and start exploring.</p>
-        <Link to="/register" className="rounded-2xl bg-(--app-color-primary) px-10 py-4 text-base font-bold text-white shadow-xl hover:bg-(--app-color-primary-hover) transition-all hover:scale-105">
-          Start Now →
+        <Link to="/register" className="rounded-2xl bg-(--app-color-primary) px-10 py-4 text-base font-bold !text-white shadow-xl hover:bg-(--app-color-primary-hover) transition-all hover:scale-105">
+          Start Now
         </Link>
       </section>
 
