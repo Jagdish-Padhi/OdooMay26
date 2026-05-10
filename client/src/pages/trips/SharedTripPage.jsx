@@ -13,6 +13,7 @@ import api from '../../services/api.js';
 import Button from '../../components/Button.jsx';
 import Card from '../../components/Card.jsx';
 import useAuthStore from '../../store/auth.store.js';
+import { tripsService } from '../../services/trips.service.js';
 import { socialShare } from '../../utils/social.js';
 
 // ─── Social Share Panel ────────────────────────────────────────────────────────
@@ -140,7 +141,7 @@ export default function SharedTripPage() {
     }
     setIsDuplicating(true);
     try {
-      await api.post(`/trips/${id}/duplicate`);
+      await tripsService.duplicate(id);
       toast.success('Trip copied to your account!');
       navigate('/trips');
     } catch {
@@ -179,7 +180,7 @@ export default function SharedTripPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-700 px-6 py-16 text-white">
+      <div className="relative overflow-hidden bg-linear-to-br from-indigo-600 to-purple-700 px-6 py-16 text-white">
         <div className="mx-auto max-w-4xl">
           <div className="mb-2 flex items-center gap-2 text-indigo-200">
             <Globe size={14} />
@@ -324,7 +325,7 @@ export default function SharedTripPage() {
         )}
 
         {/* Bottom CTA */}
-        <div className="rounded-3xl bg-gradient-to-r from-indigo-50 to-purple-50 p-8 text-center">
+        <div className="rounded-3xl bg-linear-to-r from-indigo-50 to-purple-50 p-8 text-center">
           <h3 className="text-xl font-black text-slate-800">Love this itinerary?</h3>
           <p className="mt-2 text-slate-500">Copy it to your account and make it your own.</p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">

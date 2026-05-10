@@ -8,6 +8,7 @@ export const tripsService = {
   create: (data) => api.post('/trips', data),
   update: (id, data) => api.put(`/trips/${id}`, data),
   remove: (id) => api.delete(`/trips/${id}`),
+  duplicate: (id) => api.post(`/trips/${id}/duplicate`),
 };
 
 export default tripsService;
