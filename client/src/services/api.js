@@ -1,8 +1,5 @@
-/**
- * Axios instance — attaches JWT access token to every request.
- * On 401, clears auth state so user is redirected to login.
- */
 import axios from 'axios';
+
 import useAuthStore from '../store/auth.store.js';
 
 const api = axios.create({

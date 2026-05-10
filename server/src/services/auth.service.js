@@ -1,18 +1,5 @@
-/**
- * Auth Service
- *
- * Handles registration, login, session refresh, and logout using:
- *  - bcrypt      → password hashing
- *  - JWT         → stateless access tokens (15 min) + refresh tokens (7 days)
- *  - Drizzle/PG  → user persistence
- *
- * Token strategy:
- *  - Access token  → short-lived, sent in Authorization header
- *  - Refresh token → long-lived, stored as HttpOnly cookie + hashed in DB
- *  - On each refresh → refresh token is rotated (old hash invalidated)
- */
-
 import bcrypt from 'bcrypt';
+
 import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
@@ -95,8 +82,8 @@ function buildAuthPayload(user) {
 
 /**
  * Register a new user.
- * TODO: Rename "name" field to match your entity (e.g. orgName, teamName).
  */
+
 export async function registerUser(payload = {}) {
   const db = getDb();
   const name = typeof payload.name === 'string' ? payload.name.trim() : '';

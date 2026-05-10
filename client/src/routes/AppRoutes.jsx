@@ -1,10 +1,5 @@
-/**
- * AppRoutes
- *
- * TODO: Add/remove routes to match your PS features.
- * Private routes (behind PrivateRoute) require a valid JWT session.
- */
 import { useEffect } from 'react';
+
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
@@ -13,10 +8,9 @@ import LandingPage from '../pages/landing/LandingPage.jsx';
 import LoginPage from '../pages/auth/LoginPage.jsx';
 import RegisterPage from '../pages/auth/RegisterPage.jsx';
 import DashboardHomePage from '../pages/dashboard/DashboardHomePage.jsx';
-// TODO: Import and add your domain-specific page routes below
-// import DashboardResourcesPage from '../pages/dashboard/DashboardResourcesPage.jsx';
 
 import useAuthStore from '../store/auth.store.js';
+
 
 function PrivateRoute() {
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
@@ -56,10 +50,9 @@ export default function AppRoutes() {
         <Route element={<PrivateRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardHomePage />} />
-            {/* TODO: Add your domain routes here */}
-            {/* <Route path="/dashboard/resources" element={<DashboardResourcesPage />} /> */}
           </Route>
         </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

@@ -1,8 +1,5 @@
-/**
- * Auth store — persisted to localStorage.
- * TODO: rename "app-auth-store" to match your app.
- */
 import { create } from 'zustand';
+
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 const initialState = {
@@ -27,7 +24,8 @@ const useAuthStore = create(
       setExiting: (isExiting) => set({ isExiting }),
     }),
     {
-      name: 'app-auth-store', // TODO: rename
+      name: 'traveloop-auth-store',
+
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ user: state.user, accessToken: state.accessToken, isLoggedIn: state.isLoggedIn }),
       onRehydrateStorage: () => (state) => { state?.setHydrated(); },
