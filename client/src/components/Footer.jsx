@@ -25,7 +25,7 @@ const Footer = () => {
             </div>
 
             <p className="text-sm leading-relaxed text-(--app-color-text-muted) mb-6 max-w-xs">
-              The world's first collaborative travel planner designed for modern explorers. 
+              The world&apos;s first collaborative travel planner designed for modern explorers. 
               Plan, budget, and discover with precision.
             </p>
             <div className="flex gap-4">

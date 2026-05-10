@@ -318,7 +318,7 @@ export default function ActivitySearchPage() {
               <Search className="mb-4 text-(--app-color-text-muted)" size={40} />
               <p className="text-lg font-bold text-(--app-color-text)">Search for activities</p>
               <p className="mt-1 text-sm text-(--app-color-text-muted)">
-                Enter a city and hit "Find Activities" to explore ideas.
+                Enter a city and hit &quot;Find Activities&quot; to explore ideas.
               </p>
             </div>
           )}

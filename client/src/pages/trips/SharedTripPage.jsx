@@ -252,7 +252,7 @@ export default function SharedTripPage() {
 
         {/* Stops */}
         {stops.length === 0 ? (
-          <NoStopsEmptyState tripId={tripId} />
+          <NoStopsEmptyState tripId={id} />
         ) : (
           <div className="space-y-8">
             {stops.map((stop, i) => (

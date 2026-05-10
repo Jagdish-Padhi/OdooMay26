@@ -161,7 +161,7 @@ export default function LoginPage() {
                   </Button>
                 </div>
                 <p className="mt-8 text-center text-xs text-(--app-color-text-muted)">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <Link to="/register" className="font-black text-(--app-color-primary) hover:text-(--app-color-primary-hover)">
                     Create one
                   </Link>
